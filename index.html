@@ -54,7 +54,7 @@
             const phone = document.getElementById('phone').value;
             
             // إرسال البيانات إلى Google Sheet
-            const scriptURL = 'https://script.google.com/macros/s/XXXXXXXXXX/exec'; // استبدل هذا برابط السكربت الخاص بك
+            const scriptURL = 'https://script.google.com/macros/s/AKfycbzgJVPrUETQf_9gAD3qaV_A_ku1ENrLnEYrUfd-bwkH_QDYUzR5Gd2LD8kBttmpKmf9kA/exec'; // استبدل هذا برابط السكربت الخاص بك
             fetch(scriptURL, {
                 method: 'POST',
                 body: new URLSearchParams({ 'name': name, 'phone': phone }),
