@@ -106,6 +106,10 @@
         .damaged-count {
             margin-right: 20px;
         }
+        .damage-type-group {
+            margin-top: 10px;
+            padding-right: 20px;
+        }
     </style>
 </head>
 <body>
@@ -171,6 +175,15 @@
                     <input type="number" id="stovesCount" min="0" value="0">
                     <label for="damagedStovesCount" class="damaged-count">عدد التالف منها:</label>
                     <input type="number" id="damagedStovesCount" min="0" value="0">
+                </div>
+                
+                <div id="stoveDamageTypeGroup" class="damage-type-group" style="display: none;">
+                    <label for="stoveDamageType">نوع تلف البوتجاز:</label>
+                    <select id="stoveDamageType">
+                        <option value="بيهب">بيهب</option>
+                        <option value="بيسرب غاز">بيسرب غاز</option>
+                        <option value="برومة">برومة</option>
+                    </select>
                 </div>
                 
                 <label><input type="checkbox" id="hasOven"> لديهم فرن</label>
@@ -242,6 +255,7 @@
             const damagedMattressesCount = parseInt(document.getElementById('damagedMattressesCount').value);
             const stovesCount = parseInt(document.getElementById('stovesCount').value);
             const damagedStovesCount = parseInt(document.getElementById('damagedStovesCount').value);
+            const stoveDamageType = damagedStovesCount > 0 ? document.getElementById('stoveDamageType').value : '';
             const hasOven = document.getElementById('hasOven').checked;
             const washersCount = parseInt(document.getElementById('washersCount').value);
             const damagedWashersCount = parseInt(document.getElementById('damagedWashersCount').value);
@@ -295,7 +309,11 @@
             if (familyType === 'family' && familySize >= 3) {
                 const workingStoves = stovesCount - damagedStovesCount;
                 if (workingStoves < 1 && !hasOven) {
-                    neededDevices.push('بوتجاز');
+                    if (damagedStovesCount > 0) {
+                        neededDevices.push(`بوتجاز (نوع التلف: ${stoveDamageType})`);
+                    } else {
+                        neededDevices.push('بوتجاز');
+                    }
                 }
             } else if (familyType === 'engaged') {
                 neededDevices.push('بوتجاز أو غسالة عادية (جهاز واحد فقط)');
@@ -376,6 +394,12 @@
                 medicalConditionsGroup.style.display = 'none';
                 smallApartmentGroup.style.display = 'none';
             }
+        });
+        
+        // إظهار/إخفاء نوع تلف البوتجاز عند إدخال عدد التالف
+        document.getElementById('damagedStovesCount').addEventListener('input', function() {
+            const damageTypeGroup = document.getElementById('stoveDamageTypeGroup');
+            damageTypeGroup.style.display = this.value > 0 ? 'block' : 'none';
         });
     </script>
 </body>
