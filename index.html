@@ -1,105 +1,74 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Store Management</title>
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css">
+    <title>جمع البيانات</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 20px;
+            text-align: right;
+        }
+        input, button {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        #message {
+            color: green;
+            margin-top: 10px;
+        }
+    </style>
 </head>
 <body>
-    <h1>Store Management System</h1>
-    <form id="sales-form">
-        <label for="family-name">Family Name:</label>
-        <input type="text" id="family-name" name="family_name" required>
+    <h1>نموذج جمع البيانات</h1>
+    <form id="dataForm">
+        <label for="name">الاسم:</label>
+        <input type="text" id="name" required>
         
-        <label for="code">Code:</label>
-        <input type="text" id="code" name="code" required>
-
-        <label for="phone">Phone:</label>
-        <input type="text" id="phone" name="phone" required>
-
-        <label for="responsible">Responsible Person:</label>
-        <input type="text" id="responsible" name="responsible" required>
-
-        <h2>Products</h2>
-        <div id="products-list">
-            <!-- Dynamically add products here -->
-        </div>
-
-        <label for="paid">Paid Amount:</label>
-        <input type="number" id="paid" name="paid" required>
-
-        <button type="submit">Save</button>
+        <label for="phone">رقم التليفون:</label>
+        <input type="tel" id="phone" required>
+        
+        <button type="submit">حفظ</button>
     </form>
+    <div id="message"></div>
 
-    <h2>Previous Sales</h2>
-    <table id="sales-table">
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Date</th>
-                <th>Family Name</th>
-                <th>Code</th>
-                <th>Phone</th>
-                <th>Responsible</th>
-                <th>Total</th>
-                <th>Paid</th>
-                <th>Remaining</th>
-            </tr>
-        </thead>
-        <tbody>
-            <!-- Data will be populated by JavaScript -->
-        </tbody>
-    </table>
-
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
     <script>
-        $(document).ready(function() {
-            $('#sales-table').DataTable({
-                ajax: {
-                    url: '/data',
-                    dataSrc: ''
-                },
-                columns: [
-                    { data: 0 },
-                    { data: 1 },
-                    { data: 2 },
-                    { data: 3 },
-                    { data: 4 },
-                    { data: 5 },
-                    { data: 6 },
-                    { data: 7 },
-                    { data: 8 },
-                ]
-            });
-        });
-
-        $('#sales-form').on('submit', function(e) {
+        document.getElementById('dataForm').addEventListener('submit', function(e) {
             e.preventDefault();
-            const formData = {
-                family_name: $('#family-name').val(),
-                code: $('#code').val(),
-                phone: $('#phone').val(),
-                responsible: $('#responsible').val(),
-                paid: parseFloat($('#paid').val()),
-                total: 100, // Replace with calculated total
-                remaining: 100 - parseFloat($('#paid').val()), // Replace with calculated remaining
-                products: [] // Add product data here
-            };
-
-            $.ajax({
-                url: '/save',
-                type: 'POST',
-                contentType: 'application/json',
-                data: JSON.stringify(formData),
-                success: function(response) {
-                    alert(response.message);
-                    $('#sales-table').DataTable().ajax.reload();
-                },
-                error: function(error) {
-                    alert('Error: ' + error.responseText);
+            
+            const name = document.getElementById('name').value;
+            const phone = document.getElementById('phone').value;
+            
+            // إرسال البيانات إلى Google Sheet
+            const scriptURL = 'https://script.google.com/macros/s/AKfycbzgJVPrUETQf_9gAD3qaV_A_ku1ENrLnEYrUfd-bwkH_QDYUzR5Gd2LD8kBttmpKmf9kA/exec'; // استبدل هذا برابط السكربت الخاص بك
+            fetch(scriptURL, {
+                method: 'POST',
+                body: new URLSearchParams({ 'name': name, 'phone': phone }),
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
                 }
+            })
+            .then(response => {
+                document.getElementById('message').textContent = 'تم حفظ البيانات بنجاح!';
+                document.getElementById('dataForm').reset();
+            })
+            .catch(error => {
+                document.getElementById('message').textContent = 'حدث خطأ! حاول مرة أخرى.';
+                console.error('Error!', error.message);
             });
         });
     </script>
