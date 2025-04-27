@@ -1,76 +1,64 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="ar">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>جمع البيانات</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            max-width: 500px;
-            margin: 0 auto;
-            padding: 20px;
-            text-align: right;
-        }
-        input, button {
-            width: 100%;
-            padding: 10px;
-            margin: 10px 0;
-            box-sizing: border-box;
-        }
-        button {
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            cursor: pointer;
-        }
-        button:hover {
-            background-color: #45a049;
-        }
-        #message {
-            color: green;
-            margin-top: 10px;
-        }
-    </style>
+    <title>نظام تقييم المساعدات</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <h1>نموذج جمع البيانات</h1>
-    <form id="dataForm">
-        <label for="name">الاسم:</label>
-        <input type="text" id="name" required>
-        
-        <label for="phone">رقم التليفون:</label>
-        <input type="tel" id="phone" required>
-        
-        <button type="submit">حفظ</button>
-    </form>
-    <div id="message"></div>
+    <div class="container">
+        <h1>نظام تقييم المساعدات</h1>
+        <form id="family-form">
+            <h2>بيانات الأسرة</h2>
+            <label for="family-name">اسم الأسرة:</label>
+            <input type="text" id="family-name" required>
 
-    <script>
-        document.getElementById('dataForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const name = document.getElementById('name').value;
-            const phone = document.getElementById('phone').value;
-            
-            // إرسال البيانات إلى Google Sheet
-            const scriptURL = 'https://script.google.com/macros/s/AKfycbzgJVPrUETQf_9gAD3qaV_A_ku1ENrLnEYrUfd-bwkH_QDYUzR5Gd2LD8kBttmpKmf9kA/exec'; // استبدل هذا برابط السكربت الخاص بك
-            fetch(scriptURL, {
-                method: 'POST',
-                body: new URLSearchParams({ 'name': name, 'phone': phone }),
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded'
-                }
-            })
-            .then(response => {
-                document.getElementById('message').textContent = 'تم حفظ البيانات بنجاح!';
-                document.getElementById('dataForm').reset();
-            })
-            .catch(error => {
-                document.getElementById('message').textContent = 'حدث خطأ! حاول مرة أخرى.';
-                console.error('Error!', error.message);
-            });
-        });
-    </script>
+            <label for="family-type">نوع الأسرة:</label>
+            <select id="family-type" required>
+                <option value="عروسة مخطوبة">عروسة مخطوبة</option>
+                <option value="عروسة مكتوب كتابها">عروسة مكتوب كتابها</option>
+                <option value="أسرة">أسرة</option>
+            </select>
+
+            <label for="family-members">عدد الأفراد:</label>
+            <input type="number" id="family-members" min="1" required>
+
+            <label for="income">الدخل الشهري (جنيه):</label>
+            <input type="number" id="income" min="0" required>
+
+            <label for="expenses">المصروفات الشهرية (جنيه):</label>
+            <input type="number" id="expenses" min="0" required>
+
+            <h2>الأجهزة المطلوبة</h2>
+            <div id="device-list">
+                <div class="device">
+                    <label for="device-name-0">اسم الجهاز:</label>
+                    <select id="device-name-0" class="device-name">
+                        <option value="سرير">سرير</option>
+                        <option value="مرتبة">مرتبة</option>
+                        <option value="بوتاجاز">بوتاجاز</option>
+                        <option value="غسالة عادية">غسالة عادية</option>
+                        <option value="غسالة هاف">غسالة هاف</option>
+                        <option value="ثلاجة">ثلاجة</option>
+                    </select>
+                    <label for="device-condition-0">حالة الجهاز:</label>
+                    <select id="device-condition-0" class="device-condition">
+                        <option value="جديد">جديد</option>
+                        <option value="تالف">تالف</option>
+                    </select>
+                </div>
+            </div>
+            <button type="button" id="add-device">إضافة جهاز</button>
+
+            <button type="submit">تقييم الأسرة</button>
+        </form>
+
+        <div id="result">
+            <h2>نتيجة التقييم</h2>
+            <ul id="evaluation-list"></ul>
+        </div>
+    </div>
+    <script src="app.js"></script>
 </body>
 </html>
