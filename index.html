@@ -91,21 +91,6 @@
         .rating.C {
             color: #dc3545;
         }
-        .device-count {
-            display: flex;
-            align-items: center;
-            margin-bottom: 5px;
-        }
-        .device-count label {
-            margin-right: 10px;
-            width: 150px;
-        }
-        .device-count input {
-            width: 80px;
-        }
-        .damaged-count {
-            margin-right: 20px;
-        }
     </style>
 </head>
 <body>
@@ -148,71 +133,8 @@
             <h2>الأجهزة المتوفرة حالياً</h2>
             
             <div class="form-group">
-                <h3>الأسرة والمراتب</h3>
-                <div class="device-count">
-                    <label for="bedsCount">عدد السرير المتوفرة:</label>
-                    <input type="number" id="bedsCount" min="0" value="0">
-                    <label for="damagedBedsCount" class="damaged-count">عدد التالف منها:</label>
-                    <input type="number" id="damagedBedsCount" min="0" value="0">
-                </div>
-                
-                <div class="device-count">
-                    <label for="mattressesCount">عدد المراتب المتوفرة:</label>
-                    <input type="number" id="mattressesCount" min="0" value="0">
-                    <label for="damagedMattressesCount" class="damaged-count">عدد التالف منها:</label>
-                    <input type="number" id="damagedMattressesCount" min="0" value="0">
-                </div>
-            </div>
-            
-            <div class="form-group">
-                <h3>أجهزة المطبخ</h3>
-                <div class="device-count">
-                    <label for="stovesCount">عدد البوتجاز المتوفرة:</label>
-                    <input type="number" id="stovesCount" min="0" value="0">
-                    <label for="damagedStovesCount" class="damaged-count">عدد التالف منها:</label>
-                    <input type="number" id="damagedStovesCount" min="0" value="0">
-                </div>
-                
-                <label><input type="checkbox" id="hasOven"> لديهم فرن</label>
-            </div>
-            
-            <div class="form-group">
-                <h3>الغسالات</h3>
-                <div class="device-count">
-                    <label for="washersCount">عدد الغسالات العادية المتوفرة:</label>
-                    <input type="number" id="washersCount" min="0" value="0">
-                    <label for="damagedWashersCount" class="damaged-count">عدد التالف منها:</label>
-                    <input type="number" id="damagedWashersCount" min="0" value="0">
-                </div>
-                
-                <div class="device-count">
-                    <label for="halfWashersCount">عدد الغسالات هاف المتوفرة:</label>
-                    <input type="number" id="halfWashersCount" min="0" value="0">
-                    <label for="damagedHalfWashersCount" class="damaged-count">عدد التالف منها:</label>
-                    <input type="number" id="damagedHalfWashersCount" min="0" value="0">
-                </div>
-            </div>
-            
-            <div class="form-group">
-                <h3>الثلاجات</h3>
-                <div class="device-count">
-                    <label for="fridgesCount">عدد الثلاجات المتوفرة:</label>
-                    <input type="number" id="fridgesCount" min="0" value="0">
-                    <label for="damagedFridgesCount" class="damaged-count">عدد التالف منها:</label>
-                    <input type="number" id="damagedFridgesCount" min="0" value="0">
-                </div>
-            </div>
-            
-            <div class="form-group" id="medicalConditionsGroup" style="display:none;">
-                <label>هل يوجد أفراد بحاجة لحفظ أدوية (مريض سكر يحتاج أنسولين، أمراض كبد، إلخ)؟</label>
-                <label><input type="radio" name="medicalConditions" value="yes"> نعم</label>
-                <label><input type="radio" name="medicalConditions" value="no" checked> لا</label>
-            </div>
-            
-            <div class="form-group" id="smallApartmentGroup" style="display:none;">
-                <label>هل الشقة صغيرة ولا يوجد مكان كافي للأثاث؟</label>
-                <label><input type="radio" name="smallApartment" value="yes"> نعم</label>
-                <label><input type="radio" name="smallApartment" value="no" checked> لا</label>
+                <label for="customDevices">الأجهزة المطلوبة يدويًا (افصل بين الأجهزة بفاصلة):</label>
+                <input type="text" id="customDevices" placeholder="مثال: ثلاجة, غسالة, بوتجاز">
             </div>
             
             <button type="button" onclick="evaluateFamily()">تقييم الاستحقاق</button>
@@ -228,112 +150,21 @@
 
     <script>
         function evaluateFamily() {
-            // جمع بيانات النموذج
-            const familyType = document.getElementById('familyType').value;
             const familyName = document.getElementById('familyName').value;
-            const familySize = parseInt(document.getElementById('familySize').value);
-            const income = parseFloat(document.getElementById('income').value);
-            const expenses = parseFloat(document.getElementById('expenses').value);
+            const familyType = document.getElementById('familyType').value;
+            const customDevicesField = document.getElementById('customDevices');
+            const customDevices = customDevicesField.value.trim().split(',').map(device => device.trim());
             
-            // الأجهزة المتوفرة - الكميات
-            const bedsCount = parseInt(document.getElementById('bedsCount').value);
-            const damagedBedsCount = parseInt(document.getElementById('damagedBedsCount').value);
-            const mattressesCount = parseInt(document.getElementById('mattressesCount').value);
-            const damagedMattressesCount = parseInt(document.getElementById('damagedMattressesCount').value);
-            const stovesCount = parseInt(document.getElementById('stovesCount').value);
-            const damagedStovesCount = parseInt(document.getElementById('damagedStovesCount').value);
-            const hasOven = document.getElementById('hasOven').checked;
-            const washersCount = parseInt(document.getElementById('washersCount').value);
-            const damagedWashersCount = parseInt(document.getElementById('damagedWashersCount').value);
-            const halfWashersCount = parseInt(document.getElementById('halfWashersCount').value);
-            const damagedHalfWashersCount = parseInt(document.getElementById('damagedHalfWashersCount').value);
-            const fridgesCount = parseInt(document.getElementById('fridgesCount').value);
-            const damagedFridgesCount = parseInt(document.getElementById('damagedFridgesCount').value);
-            
-            const medicalConditions = document.querySelector('input[name="medicalConditions"]:checked').value === 'yes';
-            const smallApartment = document.querySelector('input[name="smallApartment"]:checked').value === 'yes';
-            
-            // حساب صافي الدخل
-            const netIncome = income - expenses;
-            
-            // تحديد فئة الاستحقاق
-            let rating = 'C';
-            if (netIncome <= 750) rating = 'A';
-            else if (netIncome <= 1500) rating = 'B';
-            
-            // تحديد الأجهزة المطلوبة
+            // قائمة الأجهزة المطلوبة
             const neededDevices = [];
-            
-            // 1. تقييم السرير والمرتبة
-            if (familyType === 'family') {
-                const bedsNeeded = Math.ceil(familySize / 2);
-                const workingBeds = bedsCount - damagedBedsCount;
-                const workingMattresses = mattressesCount - damagedMattressesCount;
-                
-                if (smallApartment) {
-                    // إذا كانت الشقة صغيرة، نعطي مراتب بدلاً من الأسرة
-                    const mattressesDeficit = bedsNeeded - workingMattresses;
-                    if (mattressesDeficit > 0) {
-                        neededDevices.push(`مرتبة (${mattressesDeficit} عدد)`);
-                    }
-                } else {
-                    // تقييم الأسرة
-                    const bedsDeficit = bedsNeeded - workingBeds;
-                    if (bedsDeficit > 0) {
-                        neededDevices.push(`سرير (${bedsDeficit} عدد)`);
-                    }
-                    
-                    // تقييم المراتب
-                    const mattressesDeficit = bedsNeeded - workingMattresses;
-                    if (mattressesDeficit > 0) {
-                        neededDevices.push(`مرتبة (${mattressesDeficit} عدد)`);
-                    }
+
+            // إضافة الأجهزة المدخلة يدويًا إلى قائمة الأجهزة المطلوبة
+            customDevices.forEach(device => {
+                if (device && !neededDevices.includes(device)) {
+                    neededDevices.push(device);
                 }
-            }
-            
-            // 2. تقييم البوتجاز
-            if (familyType === 'family' && familySize >= 3) {
-                const workingStoves = stovesCount - damagedStovesCount;
-                if (workingStoves < 1 && !hasOven) {
-                    neededDevices.push('بوتجاز');
-                }
-            } else if (familyType === 'engaged') {
-                neededDevices.push('بوتجاز أو غسالة عادية (جهاز واحد فقط)');
-            } else if (familyType === 'married') {
-                neededDevices.push('بوتجاز');
-            }
-            
-            // 3. تقييم الغسالات
-            if (familyType === 'family') {
-                if ((familySize >= 2 && familySize <= 3) || (familySize === 1 && familySize > 60)) { // Assuming elderly
-                    const workingWashers = washersCount - damagedWashersCount;
-                    if (workingWashers < 1) {
-                        neededDevices.push('غسالة عادية');
-                    }
-                } else if (familySize >= 4) {
-                    const workingHalfWashers = halfWashersCount - damagedHalfWashersCount;
-                    if (workingHalfWashers < 1) {
-                        neededDevices.push('غسالة هاف');
-                    }
-                }
-            } else if (familyType === 'married') {
-                neededDevices.push('غسالة هاف');
-            }
-            
-            // 4. تقييم الثلاجة
-            if ((familyType === 'married') || 
-                (familyType === 'family' && (medicalConditions || familySize >= 7))) {
-                const workingFridges = fridgesCount - damagedFridgesCount;
-                if (workingFridges < 1) {
-                    neededDevices.push('ثلاجة (يحتاج موافقة المدير التنفيذي)');
-                }
-            }
-            
-            // 5. إضافة لحاف للعروسات
-            if (familyType === 'engaged' || familyType === 'married') {
-                neededDevices.push('لحاف');
-            }
-            
+            });
+
             // عرض النتائج
             const resultDiv = document.getElementById('result');
             const eligibilityText = document.getElementById('eligibilityText');
@@ -357,26 +188,11 @@
                 devicesNeededDiv.innerHTML = '';
             }
             
-            ratingText.textContent = `تصنيف الاستحقاق: ${rating}`;
-            ratingText.className = `rating ${rating}`;
+            ratingText.textContent = `تصنيف الاستحقاق: C`;
+            ratingText.className = `rating C`;
             
             resultDiv.style.display = 'block';
         }
-        
-        // إظهار/إخفاء الحقول حسب نوع الأسرة
-        document.getElementById('familyType').addEventListener('change', function() {
-            const familyType = this.value;
-            const medicalConditionsGroup = document.getElementById('medicalConditionsGroup');
-            const smallApartmentGroup = document.getElementById('smallApartmentGroup');
-            
-            if (familyType === 'family') {
-                medicalConditionsGroup.style.display = 'block';
-                smallApartmentGroup.style.display = 'block';
-            } else {
-                medicalConditionsGroup.style.display = 'none';
-                smallApartmentGroup.style.display = 'none';
-            }
-        });
     </script>
 </body>
 </html>
