@@ -91,6 +91,21 @@
         .rating.C {
             color: #dc3545;
         }
+        .device-count {
+            display: flex;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+        .device-count label {
+            margin-right: 10px;
+            width: 150px;
+        }
+        .device-count input {
+            width: 80px;
+        }
+        .damaged-count {
+            margin-right: 20px;
+        }
     </style>
 </head>
 <body>
@@ -133,34 +148,59 @@
             <h2>الأجهزة المتوفرة حالياً</h2>
             
             <div class="form-group">
-                <label><input type="checkbox" id="hasBed"> لديهم سرير</label>
-                <label><input type="checkbox" id="hasDamagedBed"> السرير تالف</label>
+                <h3>الأسرة والمراتب</h3>
+                <div class="device-count">
+                    <label for="bedsCount">عدد السرير المتوفرة:</label>
+                    <input type="number" id="bedsCount" min="0" value="0">
+                    <label for="damagedBedsCount" class="damaged-count">عدد التالف منها:</label>
+                    <input type="number" id="damagedBedsCount" min="0" value="0">
+                </div>
+                
+                <div class="device-count">
+                    <label for="mattressesCount">عدد المراتب المتوفرة:</label>
+                    <input type="number" id="mattressesCount" min="0" value="0">
+                    <label for="damagedMattressesCount" class="damaged-count">عدد التالف منها:</label>
+                    <input type="number" id="damagedMattressesCount" min="0" value="0">
+                </div>
             </div>
             
             <div class="form-group">
-                <label><input type="checkbox" id="hasMattress"> لديهم مرتبة</label>
-                <label><input type="checkbox" id="hasDamagedMattress"> المرتبة تالفة</label>
-            </div>
-            
-            <div class="form-group">
-                <label><input type="checkbox" id="hasStove"> لديهم بوتجاز</label>
-                <label><input type="checkbox" id="hasDamagedStove"> البوتجاز تالف</label>
+                <h3>أجهزة المطبخ</h3>
+                <div class="device-count">
+                    <label for="stovesCount">عدد البوتجاز المتوفرة:</label>
+                    <input type="number" id="stovesCount" min="0" value="0">
+                    <label for="damagedStovesCount" class="damaged-count">عدد التالف منها:</label>
+                    <input type="number" id="damagedStovesCount" min="0" value="0">
+                </div>
+                
                 <label><input type="checkbox" id="hasOven"> لديهم فرن</label>
             </div>
             
             <div class="form-group">
-                <label><input type="checkbox" id="hasWasher"> لديهم غسالة عادية</label>
-                <label><input type="checkbox" id="hasDamagedWasher"> الغسالة العادية تالفة</label>
+                <h3>الغسالات</h3>
+                <div class="device-count">
+                    <label for="washersCount">عدد الغسالات العادية المتوفرة:</label>
+                    <input type="number" id="washersCount" min="0" value="0">
+                    <label for="damagedWashersCount" class="damaged-count">عدد التالف منها:</label>
+                    <input type="number" id="damagedWashersCount" min="0" value="0">
+                </div>
+                
+                <div class="device-count">
+                    <label for="halfWashersCount">عدد الغسالات هاف المتوفرة:</label>
+                    <input type="number" id="halfWashersCount" min="0" value="0">
+                    <label for="damagedHalfWashersCount" class="damaged-count">عدد التالف منها:</label>
+                    <input type="number" id="damagedHalfWashersCount" min="0" value="0">
+                </div>
             </div>
             
             <div class="form-group">
-                <label><input type="checkbox" id="hasHalfWasher"> لديهم غسالة هاف</label>
-                <label><input type="checkbox" id="hasDamagedHalfWasher"> الغسالة هاف تالفة</label>
-            </div>
-            
-            <div class="form-group">
-                <label><input type="checkbox" id="hasFridge"> لديهم ثلاجة</label>
-                <label><input type="checkbox" id="hasDamagedFridge"> الثلاجة تالفة</label>
+                <h3>الثلاجات</h3>
+                <div class="device-count">
+                    <label for="fridgesCount">عدد الثلاجات المتوفرة:</label>
+                    <input type="number" id="fridgesCount" min="0" value="0">
+                    <label for="damagedFridgesCount" class="damaged-count">عدد التالف منها:</label>
+                    <input type="number" id="damagedFridgesCount" min="0" value="0">
+                </div>
             </div>
             
             <div class="form-group" id="medicalConditionsGroup" style="display:none;">
@@ -195,20 +235,21 @@
             const income = parseFloat(document.getElementById('income').value);
             const expenses = parseFloat(document.getElementById('expenses').value);
             
-            // الأجهزة المتوفرة
-            const hasBed = document.getElementById('hasBed').checked;
-            const hasDamagedBed = document.getElementById('hasDamagedBed').checked;
-            const hasMattress = document.getElementById('hasMattress').checked;
-            const hasDamagedMattress = document.getElementById('hasDamagedMattress').checked;
-            const hasStove = document.getElementById('hasStove').checked;
-            const hasDamagedStove = document.getElementById('hasDamagedStove').checked;
+            // الأجهزة المتوفرة - الكميات
+            const bedsCount = parseInt(document.getElementById('bedsCount').value);
+            const damagedBedsCount = parseInt(document.getElementById('damagedBedsCount').value);
+            const mattressesCount = parseInt(document.getElementById('mattressesCount').value);
+            const damagedMattressesCount = parseInt(document.getElementById('damagedMattressesCount').value);
+            const stovesCount = parseInt(document.getElementById('stovesCount').value);
+            const damagedStovesCount = parseInt(document.getElementById('damagedStovesCount').value);
             const hasOven = document.getElementById('hasOven').checked;
-            const hasWasher = document.getElementById('hasWasher').checked;
-            const hasDamagedWasher = document.getElementById('hasDamagedWasher').checked;
-            const hasHalfWasher = document.getElementById('hasHalfWasher').checked;
-            const hasDamagedHalfWasher = document.getElementById('hasDamagedHalfWasher').checked;
-            const hasFridge = document.getElementById('hasFridge').checked;
-            const hasDamagedFridge = document.getElementById('hasDamagedFridge').checked;
+            const washersCount = parseInt(document.getElementById('washersCount').value);
+            const damagedWashersCount = parseInt(document.getElementById('damagedWashersCount').value);
+            const halfWashersCount = parseInt(document.getElementById('halfWashersCount').value);
+            const damagedHalfWashersCount = parseInt(document.getElementById('damagedHalfWashersCount').value);
+            const fridgesCount = parseInt(document.getElementById('fridgesCount').value);
+            const damagedFridgesCount = parseInt(document.getElementById('damagedFridgesCount').value);
+            
             const medicalConditions = document.querySelector('input[name="medicalConditions"]:checked').value === 'yes';
             const smallApartment = document.querySelector('input[name="smallApartment"]:checked').value === 'yes';
             
@@ -226,25 +267,36 @@
             // 1. تقييم السرير والمرتبة
             if (familyType === 'family') {
                 const bedsNeeded = Math.ceil(familySize / 2);
+                const workingBeds = bedsCount - damagedBedsCount;
+                const workingMattresses = mattressesCount - damagedMattressesCount;
                 
                 if (smallApartment) {
                     // إذا كانت الشقة صغيرة، نعطي مراتب بدلاً من الأسرة
-                    if (!hasMattress || hasDamagedMattress) {
-                        neededDevices.push(`مرتبة (${bedsNeeded} عدد)`);
+                    const mattressesDeficit = bedsNeeded - workingMattresses;
+                    if (mattressesDeficit > 0) {
+                        neededDevices.push(`مرتبة (${mattressesDeficit} عدد)`);
                     }
                 } else {
-                    if (!hasBed || hasDamagedBed) {
-                        neededDevices.push(`سرير (${bedsNeeded} عدد)`);
+                    // تقييم الأسرة
+                    const bedsDeficit = bedsNeeded - workingBeds;
+                    if (bedsDeficit > 0) {
+                        neededDevices.push(`سرير (${bedsDeficit} عدد)`);
                     }
-                    if (!hasMattress || hasDamagedMattress) {
-                        neededDevices.push(`مرتبة (${bedsNeeded} عدد)`);
+                    
+                    // تقييم المراتب
+                    const mattressesDeficit = bedsNeeded - workingMattresses;
+                    if (mattressesDeficit > 0) {
+                        neededDevices.push(`مرتبة (${mattressesDeficit} عدد)`);
                     }
                 }
             }
             
             // 2. تقييم البوتجاز
-            if (familyType === 'family' && familySize >= 3 && (!hasStove || hasDamagedStove) && !hasOven) {
-                neededDevices.push('بوتجاز');
+            if (familyType === 'family' && familySize >= 3) {
+                const workingStoves = stovesCount - damagedStovesCount;
+                if (workingStoves < 1 && !hasOven) {
+                    neededDevices.push('بوتجاز');
+                }
             } else if (familyType === 'engaged') {
                 neededDevices.push('بوتجاز أو غسالة عادية (جهاز واحد فقط)');
             } else if (familyType === 'married') {
@@ -254,11 +306,13 @@
             // 3. تقييم الغسالات
             if (familyType === 'family') {
                 if ((familySize >= 2 && familySize <= 3) || (familySize === 1 && familySize > 60)) { // Assuming elderly
-                    if (!hasWasher || hasDamagedWasher) {
+                    const workingWashers = washersCount - damagedWashersCount;
+                    if (workingWashers < 1) {
                         neededDevices.push('غسالة عادية');
                     }
                 } else if (familySize >= 4) {
-                    if (!hasHalfWasher || hasDamagedHalfWasher) {
+                    const workingHalfWashers = halfWashersCount - damagedHalfWashersCount;
+                    if (workingHalfWashers < 1) {
                         neededDevices.push('غسالة هاف');
                     }
                 }
@@ -267,10 +321,12 @@
             }
             
             // 4. تقييم الثلاجة
-            if ((familyType === 'married' && (!hasFridge || hasDamagedFridge)) ||
-                (familyType === 'family' && ((medicalConditions) || 
-                 (familySize >= 7 && (!hasFridge || hasDamagedFridge)))) {
-                neededDevices.push('ثلاجة (يحتاج موافقة المدير التنفيذي)');
+            if ((familyType === 'married') || 
+                (familyType === 'family' && (medicalConditions || familySize >= 7))) {
+                const workingFridges = fridgesCount - damagedFridgesCount;
+                if (workingFridges < 1) {
+                    neededDevices.push('ثلاجة (يحتاج موافقة المدير التنفيذي)');
+                }
             }
             
             // 5. إضافة لحاف للعروسات
