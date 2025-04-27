@@ -1,15 +1,17 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="ar">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>جمع البيانات</title>
+    <title>نموذج البيانات</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             max-width: 500px;
             margin: 0 auto;
             padding: 20px;
+        }
+        .form-container {
             text-align: right;
         }
         input, button {
@@ -17,34 +19,42 @@
             padding: 10px;
             margin: 10px 0;
             box-sizing: border-box;
+            text-align: left;
+            direction: ltr;
+        }
+        label {
+            display: block;
+            text-align: right;
+            margin-top: 10px;
         }
         button {
             background-color: #4CAF50;
             color: white;
             border: none;
             cursor: pointer;
-        }
-        button:hover {
-            background-color: #45a049;
+            text-align: center;
         }
         #message {
             color: green;
             margin-top: 10px;
+            text-align: center;
         }
     </style>
 </head>
 <body>
-    <h1>نموذج جمع البيانات</h1>
-    <form id="dataForm">
-        <label for="name">الاسم:</label>
-        <input type="text" id="name" required>
-        
-        <label for="phone">رقم التليفون:</label>
-        <input type="tel" id="phone" required>
-        
-        <button type="submit">حفظ</button>
-    </form>
-    <div id="message"></div>
+    <div class="form-container">
+        <h1>نموذج إدخال البيانات</h1>
+        <form id="dataForm">
+            <label for="name">الاسم:</label>
+            <input type="text" id="name" required>
+            
+            <label for="phone">رقم الهاتف:</label>
+            <input type="tel" id="phone" required>
+            
+            <button type="submit">حفظ البيانات</button>
+        </form>
+        <div id="message"></div>
+    </div>
 
     <script>
         document.getElementById('dataForm').addEventListener('submit', function(e) {
@@ -53,8 +63,7 @@
             const name = document.getElementById('name').value;
             const phone = document.getElementById('phone').value;
             
-            // إرسال البيانات إلى Google Sheet
-            const scriptURL = 'https://script.google.com/macros/s/AKfycbzgJVPrUETQf_9gAD3qaV_A_ku1ENrLnEYrUfd-bwkH_QDYUzR5Gd2LD8kBttmpKmf9kA/exec'; // استبدل هذا برابط السكربت الخاص بك
+            const scriptURL = 'YOUR_SCRIPT_URL_HERE';
             fetch(scriptURL, {
                 method: 'POST',
                 body: new URLSearchParams({ 'name': name, 'phone': phone }),
@@ -65,9 +74,12 @@
             .then(response => {
                 document.getElementById('message').textContent = 'تم حفظ البيانات بنجاح!';
                 document.getElementById('dataForm').reset();
+                setTimeout(() => {
+                    document.getElementById('message').textContent = '';
+                }, 3000);
             })
             .catch(error => {
-                document.getElementById('message').textContent = 'حدث خطأ! حاول مرة أخرى.';
+                document.getElementById('message').textContent = 'حدث خطأ! يرجى المحاولة مرة أخرى.';
                 console.error('Error!', error.message);
             });
         });
