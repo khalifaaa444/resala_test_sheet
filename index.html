@@ -91,17 +91,6 @@
         .rating.C {
             color: #dc3545;
         }
-        .devices-section {
-            display: none;
-        }
-        .device-option {
-            margin-bottom: 5px;
-        }
-        .device-quantity {
-            width: 60px;
-            display: inline-block;
-            margin-right: 10px;
-        }
     </style>
 </head>
 <body>
@@ -186,47 +175,6 @@
                 <label><input type="radio" name="smallApartment" value="no" checked> لا</label>
             </div>
             
-            <h2>الأجهزة المطلوبة</h2>
-            <div id="devicesRequestedSection" class="devices-section">
-                <div class="form-group">
-                    <label>اختر الأجهزة المطلوبة:</label>
-                    
-                    <div class="device-option">
-                        <label><input type="checkbox" class="requested-device" value="سرير"> سرير</label>
-                        <input type="number" class="device-quantity" min="1" value="1" style="display:none;">
-                    </div>
-                    
-                    <div class="device-option">
-                        <label><input type="checkbox" class="requested-device" value="مرتبة"> مرتبة</label>
-                        <input type="number" class="device-quantity" min="1" value="1" style="display:none;">
-                    </div>
-                    
-                    <div class="device-option">
-                        <label><input type="checkbox" class="requested-device" value="بوتجاز"> بوتجاز</label>
-                    </div>
-                    
-                    <div class="device-option">
-                        <label><input type="checkbox" class="requested-device" value="فرن"> فرن</label>
-                    </div>
-                    
-                    <div class="device-option">
-                        <label><input type="checkbox" class="requested-device" value="غسالة عادية"> غسالة عادية</label>
-                    </div>
-                    
-                    <div class="device-option">
-                        <label><input type="checkbox" class="requested-device" value="غسالة هاف"> غسالة هاف</label>
-                    </div>
-                    
-                    <div class="device-option">
-                        <label><input type="checkbox" class="requested-device" value="ثلاجة"> ثلاجة</label>
-                    </div>
-                    
-                    <div class="device-option">
-                        <label><input type="checkbox" class="requested-device" value="لحاف"> لحاف</label>
-                    </div>
-                </div>
-            </div>
-            
             <button type="button" onclick="evaluateFamily()">تقييم الاستحقاق</button>
         </form>
         
@@ -247,6 +195,23 @@
             const income = parseFloat(document.getElementById('income').value);
             const expenses = parseFloat(document.getElementById('expenses').value);
             
+            // الأجهزة المتوفرة
+            const hasBed = document.getElementById('hasBed').checked;
+            const hasDamagedBed = document.getElementById('hasDamagedBed').checked;
+            const hasMattress = document.getElementById('hasMattress').checked;
+            const hasDamagedMattress = document.getElementById('hasDamagedMattress').checked;
+            const hasStove = document.getElementById('hasStove').checked;
+            const hasDamagedStove = document.getElementById('hasDamagedStove').checked;
+            const hasOven = document.getElementById('hasOven').checked;
+            const hasWasher = document.getElementById('hasWasher').checked;
+            const hasDamagedWasher = document.getElementById('hasDamagedWasher').checked;
+            const hasHalfWasher = document.getElementById('hasHalfWasher').checked;
+            const hasDamagedHalfWasher = document.getElementById('hasDamagedHalfWasher').checked;
+            const hasFridge = document.getElementById('hasFridge').checked;
+            const hasDamagedFridge = document.getElementById('hasDamagedFridge').checked;
+            const medicalConditions = document.querySelector('input[name="medicalConditions"]:checked').value === 'yes';
+            const smallApartment = document.querySelector('input[name="smallApartment"]:checked').value === 'yes';
+            
             // حساب صافي الدخل
             const netIncome = income - expenses;
             
@@ -255,25 +220,63 @@
             if (netIncome <= 750) rating = 'A';
             else if (netIncome <= 1500) rating = 'B';
             
-            // جمع الأجهزة المطلوبة المحددة من قبل المستخدم
-            const requestedDevices = [];
-            const deviceOptions = document.querySelectorAll('.requested-device:checked');
+            // تحديد الأجهزة المطلوبة
+            const neededDevices = [];
             
-            deviceOptions.forEach(option => {
-                const deviceName = option.value;
-                const quantityInput = option.parentElement.nextElementSibling;
+            // 1. تقييم السرير والمرتبة
+            if (familyType === 'family') {
+                const bedsNeeded = Math.ceil(familySize / 2);
                 
-                if (quantityInput && quantityInput.classList.contains('device-quantity')) {
-                    const quantity = parseInt(quantityInput.value) || 1;
-                    if (quantity > 1) {
-                        requestedDevices.push(`${deviceName} (${quantity} عدد)`);
-                    } else {
-                        requestedDevices.push(deviceName);
+                if (smallApartment) {
+                    // إذا كانت الشقة صغيرة، نعطي مراتب بدلاً من الأسرة
+                    if (!hasMattress || hasDamagedMattress) {
+                        neededDevices.push(`مرتبة (${bedsNeeded} عدد)`);
                     }
                 } else {
-                    requestedDevices.push(deviceName);
+                    if (!hasBed || hasDamagedBed) {
+                        neededDevices.push(`سرير (${bedsNeeded} عدد)`);
+                    }
+                    if (!hasMattress || hasDamagedMattress) {
+                        neededDevices.push(`مرتبة (${bedsNeeded} عدد)`);
+                    }
                 }
-            });
+            }
+            
+            // 2. تقييم البوتجاز
+            if (familyType === 'family' && familySize >= 3 && (!hasStove || hasDamagedStove) && !hasOven) {
+                neededDevices.push('بوتجاز');
+            } else if (familyType === 'engaged') {
+                neededDevices.push('بوتجاز أو غسالة عادية (جهاز واحد فقط)');
+            } else if (familyType === 'married') {
+                neededDevices.push('بوتجاز');
+            }
+            
+            // 3. تقييم الغسالات
+            if (familyType === 'family') {
+                if ((familySize >= 2 && familySize <= 3) || (familySize === 1 && familySize > 60)) { // Assuming elderly
+                    if (!hasWasher || hasDamagedWasher) {
+                        neededDevices.push('غسالة عادية');
+                    }
+                } else if (familySize >= 4) {
+                    if (!hasHalfWasher || hasDamagedHalfWasher) {
+                        neededDevices.push('غسالة هاف');
+                    }
+                }
+            } else if (familyType === 'married') {
+                neededDevices.push('غسالة هاف');
+            }
+            
+            // 4. تقييم الثلاجة
+            if ((familyType === 'married' && (!hasFridge || hasDamagedFridge)) ||
+                (familyType === 'family' && ((medicalConditions) || 
+                 (familySize >= 7 && (!hasFridge || hasDamagedFridge)))) {
+                neededDevices.push('ثلاجة (يحتاج موافقة المدير التنفيذي)');
+            }
+            
+            // 5. إضافة لحاف للعروسات
+            if (familyType === 'engaged' || familyType === 'married') {
+                neededDevices.push('لحاف');
+            }
             
             // عرض النتائج
             const resultDiv = document.getElementById('result');
@@ -281,12 +284,12 @@
             const devicesNeededDiv = document.getElementById('devicesNeeded');
             const ratingText = document.getElementById('ratingText');
             
-            if (requestedDevices.length > 0) {
+            if (neededDevices.length > 0) {
                 resultDiv.className = 'result eligible';
                 eligibilityText.textContent = `الأسرة/العروسة ${familyName} مؤهلة للحصول على المساعدات.`;
                 
                 devicesNeededDiv.innerHTML = '<h3>الأجهزة المطلوبة:</h3>';
-                requestedDevices.forEach(device => {
+                neededDevices.forEach(device => {
                     const deviceItem = document.createElement('div');
                     deviceItem.className = 'device-item';
                     deviceItem.textContent = device;
@@ -309,7 +312,6 @@
             const familyType = this.value;
             const medicalConditionsGroup = document.getElementById('medicalConditionsGroup');
             const smallApartmentGroup = document.getElementById('smallApartmentGroup');
-            const devicesRequestedSection = document.getElementById('devicesRequestedSection');
             
             if (familyType === 'family') {
                 medicalConditionsGroup.style.display = 'block';
@@ -318,23 +320,6 @@
                 medicalConditionsGroup.style.display = 'none';
                 smallApartmentGroup.style.display = 'none';
             }
-            
-            // إظهار قسم الأجهزة المطلوبة عند اختيار نوع الأسرة
-            if (familyType) {
-                devicesRequestedSection.style.display = 'block';
-            } else {
-                devicesRequestedSection.style.display = 'none';
-            }
-        });
-        
-        // إظهار/إخفاء حقول الكمية للأجهزة التي يمكن طلب أكثر من واحدة
-        document.querySelectorAll('.requested-device').forEach(device => {
-            device.addEventListener('change', function() {
-                const quantityInput = this.parentElement.nextElementSibling;
-                if (quantityInput && quantityInput.classList.contains('device-quantity')) {
-                    quantityInput.style.display = this.checked ? 'inline-block' : 'none';
-                }
-            });
         });
     </script>
 </body>
