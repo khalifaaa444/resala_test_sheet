@@ -1,64 +1,326 @@
 <!DOCTYPE html>
-<html lang="ar">
+<html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>نظام تقييم المساعدات</title>
-    <link rel="stylesheet" href="style.css">
+    <title>نظام تقييم استحقاق الأسر للمساعدات</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h1, h2 {
+            color: #2c3e50;
+            text-align: center;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input, select, textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #3498db;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            display: block;
+            margin: 20px auto;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        .result {
+            margin-top: 30px;
+            padding: 15px;
+            border-radius: 4px;
+            background-color: #f8f9fa;
+            display: none;
+        }
+        .eligible {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .not-eligible {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        .devices-list {
+            margin-top: 15px;
+        }
+        .device-item {
+            padding: 8px;
+            margin-bottom: 5px;
+            background-color: #e9ecef;
+            border-radius: 4px;
+        }
+        .rating {
+            font-weight: bold;
+            font-size: 18px;
+            margin-top: 10px;
+        }
+        .rating.A {
+            color: #28a745;
+        }
+        .rating.B {
+            color: #ffc107;
+        }
+        .rating.C {
+            color: #dc3545;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
-        <h1>نظام تقييم المساعدات</h1>
-        <form id="family-form">
+        <h1>نظام تقييم استحقاق الأسر للمساعدات</h1>
+        
+        <form id="familyForm">
             <h2>بيانات الأسرة</h2>
-            <label for="family-name">اسم الأسرة:</label>
-            <input type="text" id="family-name" required>
-
-            <label for="family-type">نوع الأسرة:</label>
-            <select id="family-type" required>
-                <option value="عروسة مخطوبة">عروسة مخطوبة</option>
-                <option value="عروسة مكتوب كتابها">عروسة مكتوب كتابها</option>
-                <option value="أسرة">أسرة</option>
-            </select>
-
-            <label for="family-members">عدد الأفراد:</label>
-            <input type="number" id="family-members" min="1" required>
-
-            <label for="income">الدخل الشهري (جنيه):</label>
-            <input type="number" id="income" min="0" required>
-
-            <label for="expenses">المصروفات الشهرية (جنيه):</label>
-            <input type="number" id="expenses" min="0" required>
-
-            <h2>الأجهزة المطلوبة</h2>
-            <div id="device-list">
-                <div class="device">
-                    <label for="device-name-0">اسم الجهاز:</label>
-                    <select id="device-name-0" class="device-name">
-                        <option value="سرير">سرير</option>
-                        <option value="مرتبة">مرتبة</option>
-                        <option value="بوتاجاز">بوتاجاز</option>
-                        <option value="غسالة عادية">غسالة عادية</option>
-                        <option value="غسالة هاف">غسالة هاف</option>
-                        <option value="ثلاجة">ثلاجة</option>
-                    </select>
-                    <label for="device-condition-0">حالة الجهاز:</label>
-                    <select id="device-condition-0" class="device-condition">
-                        <option value="جديد">جديد</option>
-                        <option value="تالف">تالف</option>
-                    </select>
-                </div>
+            
+            <div class="form-group">
+                <label for="familyType">نوع الأسرة:</label>
+                <select id="familyType" required>
+                    <option value="">-- اختر نوع الأسرة --</option>
+                    <option value="engaged">عروسة مخطوبة</option>
+                    <option value="married">عروسة مكتوب كتابها</option>
+                    <option value="family">أسرة</option>
+                </select>
             </div>
-            <button type="button" id="add-device">إضافة جهاز</button>
-
-            <button type="submit">تقييم الأسرة</button>
+            
+            <div class="form-group">
+                <label for="familyName">اسم الأسرة / العروسة:</label>
+                <input type="text" id="familyName" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="familySize">عدد أفراد الأسرة:</label>
+                <input type="number" id="familySize" min="1" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="income">الدخل الشهري (جنيه):</label>
+                <input type="number" id="income" min="0" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="expenses">المصروفات الشهرية (جنيه):</label>
+                <input type="number" id="expenses" min="0" required>
+            </div>
+            
+            <h2>الأجهزة المتوفرة حالياً</h2>
+            
+            <div class="form-group">
+                <label><input type="checkbox" id="hasBed"> لديهم سرير</label>
+                <label><input type="checkbox" id="hasDamagedBed"> السرير تالف</label>
+            </div>
+            
+            <div class="form-group">
+                <label><input type="checkbox" id="hasMattress"> لديهم مرتبة</label>
+                <label><input type="checkbox" id="hasDamagedMattress"> المرتبة تالفة</label>
+            </div>
+            
+            <div class="form-group">
+                <label><input type="checkbox" id="hasStove"> لديهم بوتجاز</label>
+                <label><input type="checkbox" id="hasDamagedStove"> البوتجاز تالف</label>
+                <label><input type="checkbox" id="hasOven"> لديهم فرن</label>
+            </div>
+            
+            <div class="form-group">
+                <label><input type="checkbox" id="hasWasher"> لديهم غسالة عادية</label>
+                <label><input type="checkbox" id="hasDamagedWasher"> الغسالة العادية تالفة</label>
+            </div>
+            
+            <div class="form-group">
+                <label><input type="checkbox" id="hasHalfWasher"> لديهم غسالة هاف</label>
+                <label><input type="checkbox" id="hasDamagedHalfWasher"> الغسالة هاف تالفة</label>
+            </div>
+            
+            <div class="form-group">
+                <label><input type="checkbox" id="hasFridge"> لديهم ثلاجة</label>
+                <label><input type="checkbox" id="hasDamagedFridge"> الثلاجة تالفة</label>
+            </div>
+            
+            <div class="form-group" id="medicalConditionsGroup" style="display:none;">
+                <label>هل يوجد أفراد بحاجة لحفظ أدوية (مريض سكر يحتاج أنسولين، أمراض كبد، إلخ)؟</label>
+                <label><input type="radio" name="medicalConditions" value="yes"> نعم</label>
+                <label><input type="radio" name="medicalConditions" value="no" checked> لا</label>
+            </div>
+            
+            <div class="form-group" id="smallApartmentGroup" style="display:none;">
+                <label>هل الشقة صغيرة ولا يوجد مكان كافي للأثاث؟</label>
+                <label><input type="radio" name="smallApartment" value="yes"> نعم</label>
+                <label><input type="radio" name="smallApartment" value="no" checked> لا</label>
+            </div>
+            
+            <button type="button" onclick="evaluateFamily()">تقييم الاستحقاق</button>
         </form>
-
-        <div id="result">
+        
+        <div id="result" class="result">
             <h2>نتيجة التقييم</h2>
-            <ul id="evaluation-list"></ul>
+            <p id="eligibilityText"></p>
+            <div id="devicesNeeded" class="devices-list"></div>
+            <p id="ratingText" class="rating"></p>
         </div>
     </div>
-    <script src="app.js"></script>
+
+    <script>
+        function evaluateFamily() {
+            // جمع بيانات النموذج
+            const familyType = document.getElementById('familyType').value;
+            const familyName = document.getElementById('familyName').value;
+            const familySize = parseInt(document.getElementById('familySize').value);
+            const income = parseFloat(document.getElementById('income').value);
+            const expenses = parseFloat(document.getElementById('expenses').value);
+            
+            // الأجهزة المتوفرة
+            const hasBed = document.getElementById('hasBed').checked;
+            const hasDamagedBed = document.getElementById('hasDamagedBed').checked;
+            const hasMattress = document.getElementById('hasMattress').checked;
+            const hasDamagedMattress = document.getElementById('hasDamagedMattress').checked;
+            const hasStove = document.getElementById('hasStove').checked;
+            const hasDamagedStove = document.getElementById('hasDamagedStove').checked;
+            const hasOven = document.getElementById('hasOven').checked;
+            const hasWasher = document.getElementById('hasWasher').checked;
+            const hasDamagedWasher = document.getElementById('hasDamagedWasher').checked;
+            const hasHalfWasher = document.getElementById('hasHalfWasher').checked;
+            const hasDamagedHalfWasher = document.getElementById('hasDamagedHalfWasher').checked;
+            const hasFridge = document.getElementById('hasFridge').checked;
+            const hasDamagedFridge = document.getElementById('hasDamagedFridge').checked;
+            const medicalConditions = document.querySelector('input[name="medicalConditions"]:checked').value === 'yes';
+            const smallApartment = document.querySelector('input[name="smallApartment"]:checked').value === 'yes';
+            
+            // حساب صافي الدخل
+            const netIncome = income - expenses;
+            
+            // تحديد فئة الاستحقاق
+            let rating = 'C';
+            if (netIncome <= 750) rating = 'A';
+            else if (netIncome <= 1500) rating = 'B';
+            
+            // تحديد الأجهزة المطلوبة
+            const neededDevices = [];
+            
+            // 1. تقييم السرير والمرتبة
+            if (familyType === 'family') {
+                const bedsNeeded = Math.ceil(familySize / 2);
+                
+                if (smallApartment) {
+                    // إذا كانت الشقة صغيرة، نعطي مراتب بدلاً من الأسرة
+                    if (!hasMattress || hasDamagedMattress) {
+                        neededDevices.push(`مرتبة (${bedsNeeded} عدد)`);
+                    }
+                } else {
+                    if (!hasBed || hasDamagedBed) {
+                        neededDevices.push(`سرير (${bedsNeeded} عدد)`);
+                    }
+                    if (!hasMattress || hasDamagedMattress) {
+                        neededDevices.push(`مرتبة (${bedsNeeded} عدد)`);
+                    }
+                }
+            }
+            
+            // 2. تقييم البوتجاز
+            if (familyType === 'family' && familySize >= 3 && (!hasStove || hasDamagedStove) && !hasOven) {
+                neededDevices.push('بوتجاز');
+            } else if (familyType === 'engaged') {
+                neededDevices.push('بوتجاز أو غسالة عادية (جهاز واحد فقط)');
+            } else if (familyType === 'married') {
+                neededDevices.push('بوتجاز');
+            }
+            
+            // 3. تقييم الغسالات
+            if (familyType === 'family') {
+                if ((familySize >= 2 && familySize <= 3) || (familySize === 1 && familySize > 60)) { // Assuming elderly
+                    if (!hasWasher || hasDamagedWasher) {
+                        neededDevices.push('غسالة عادية');
+                    }
+                } else if (familySize >= 4) {
+                    if (!hasHalfWasher || hasDamagedHalfWasher) {
+                        neededDevices.push('غسالة هاف');
+                    }
+                }
+            } else if (familyType === 'married') {
+                neededDevices.push('غسالة هاف');
+            }
+            
+            // 4. تقييم الثلاجة
+            if ((familyType === 'married' && (!hasFridge || hasDamagedFridge)) ||
+                (familyType === 'family' && ((medicalConditions) || 
+                 (familySize >= 7 && (!hasFridge || hasDamagedFridge)))) {
+                neededDevices.push('ثلاجة (يحتاج موافقة المدير التنفيذي)');
+            }
+            
+            // 5. إضافة لحاف للعروسات
+            if (familyType === 'engaged' || familyType === 'married') {
+                neededDevices.push('لحاف');
+            }
+            
+            // عرض النتائج
+            const resultDiv = document.getElementById('result');
+            const eligibilityText = document.getElementById('eligibilityText');
+            const devicesNeededDiv = document.getElementById('devicesNeeded');
+            const ratingText = document.getElementById('ratingText');
+            
+            if (neededDevices.length > 0) {
+                resultDiv.className = 'result eligible';
+                eligibilityText.textContent = `الأسرة/العروسة ${familyName} مؤهلة للحصول على المساعدات.`;
+                
+                devicesNeededDiv.innerHTML = '<h3>الأجهزة المطلوبة:</h3>';
+                neededDevices.forEach(device => {
+                    const deviceItem = document.createElement('div');
+                    deviceItem.className = 'device-item';
+                    deviceItem.textContent = device;
+                    devicesNeededDiv.appendChild(deviceItem);
+                });
+            } else {
+                resultDiv.className = 'result not-eligible';
+                eligibilityText.textContent = `الأسرة/العروسة ${familyName} غير مؤهلة للحصول على مساعدات إضافية.`;
+                devicesNeededDiv.innerHTML = '';
+            }
+            
+            ratingText.textContent = `تصنيف الاستحقاق: ${rating}`;
+            ratingText.className = `rating ${rating}`;
+            
+            resultDiv.style.display = 'block';
+        }
+        
+        // إظهار/إخفاء الحقول حسب نوع الأسرة
+        document.getElementById('familyType').addEventListener('change', function() {
+            const familyType = this.value;
+            const medicalConditionsGroup = document.getElementById('medicalConditionsGroup');
+            const smallApartmentGroup = document.getElementById('smallApartmentGroup');
+            
+            if (familyType === 'family') {
+                medicalConditionsGroup.style.display = 'block';
+                smallApartmentGroup.style.display = 'block';
+            } else {
+                medicalConditionsGroup.style.display = 'none';
+                smallApartmentGroup.style.display = 'none';
+            }
+        });
+    </script>
 </body>
 </html>
