@@ -109,6 +109,12 @@
         .damage-type-group {
             margin-top: 10px;
             padding-right: 20px;
+            border-right: 2px solid #ddd;
+            margin-bottom: 15px;
+        }
+        .other-input {
+            width: 90%;
+            margin-top: 5px;
         }
     </style>
 </head>
@@ -198,11 +204,39 @@
                     <input type="number" id="damagedWashersCount" min="0" value="0">
                 </div>
                 
+                <div id="washerDamageTypeGroup" class="damage-type-group" style="display: none;">
+                    <label for="washerDamageType">نوع تلف الغسالة العادية:</label>
+                    <select id="washerDamageType" onchange="toggleWasherOther(this)">
+                        <option value="موتور">موتور</option>
+                        <option value="برومة">برومة</option>
+                        <option value="عصر">عصر</option>
+                        <option value="مروحة">مروحة</option>
+                        <option value="غير ذلك">غير ذلك</option>
+                    </select>
+                    <input type="text" id="washerOther" class="other-input" 
+                           placeholder="حدد نوع التلف" 
+                           style="display: none; margin-top: 5px;">
+                </div>
+
                 <div class="device-count">
                     <label for="halfWashersCount">عدد الغسالات هاف المتوفرة:</label>
                     <input type="number" id="halfWashersCount" min="0" value="0">
                     <label for="damagedHalfWashersCount" class="damaged-count">عدد التالف منها:</label>
                     <input type="number" id="damagedHalfWashersCount" min="0" value="0">
+                </div>
+                
+                <div id="halfWasherDamageTypeGroup" class="damage-type-group" style="display: none;">
+                    <label for="halfWasherDamageType">نوع تلف الغسالة الهاف:</label>
+                    <select id="halfWasherDamageType" onchange="toggleHalfWasherOther(this)">
+                        <option value="موتور">موتور</option>
+                        <option value="برومة">برومة</option>
+                        <option value="عصر">عصر</option>
+                        <option value="مروحة">مروحة</option>
+                        <option value="غير ذلك">غير ذلك</option>
+                    </select>
+                    <input type="text" id="halfWasherOther" class="other-input" 
+                           placeholder="حدد نوع التلف" 
+                           style="display: none; margin-top: 5px;">
                 </div>
             </div>
             
@@ -259,8 +293,16 @@
             const hasOven = document.getElementById('hasOven').checked;
             const washersCount = parseInt(document.getElementById('washersCount').value);
             const damagedWashersCount = parseInt(document.getElementById('damagedWashersCount').value);
+            const washerDamageType = damagedWashersCount > 0 ? 
+                (document.getElementById('washerDamageType').value === 'غير ذلك' ?
+                    document.getElementById('washerOther').value :
+                    document.getElementById('washerDamageType').value) : '';
             const halfWashersCount = parseInt(document.getElementById('halfWashersCount').value);
             const damagedHalfWashersCount = parseInt(document.getElementById('damagedHalfWashersCount').value);
+            const halfWasherDamageType = damagedHalfWashersCount > 0 ? 
+                (document.getElementById('halfWasherDamageType').value === 'غير ذلك' ?
+                    document.getElementById('halfWasherOther').value :
+                    document.getElementById('halfWasherDamageType').value) : '';
             const fridgesCount = parseInt(document.getElementById('fridgesCount').value);
             const damagedFridgesCount = parseInt(document.getElementById('damagedFridgesCount').value);
             
@@ -326,12 +368,14 @@
                 if ((familySize >= 2 && familySize <= 3) || (familySize === 1 && familySize > 60)) { // Assuming elderly
                     const workingWashers = washersCount - damagedWashersCount;
                     if (workingWashers < 1) {
-                        neededDevices.push('غسالة عادية');
+                        const damageNote = damagedWashersCount > 0 ? ` (نوع التلف: ${washerDamageType})` : '';
+                        neededDevices.push(`غسالة عادية${damageNote}`);
                     }
                 } else if (familySize >= 4) {
                     const workingHalfWashers = halfWashersCount - damagedHalfWashersCount;
                     if (workingHalfWashers < 1) {
-                        neededDevices.push('غسالة هاف');
+                        const damageNote = damagedHalfWashersCount > 0 ? ` (نوع التلف: ${halfWasherDamageType})` : '';
+                        neededDevices.push(`غسالة هاف${damageNote}`);
                     }
                 }
             } else if (familyType === 'married') {
@@ -401,6 +445,32 @@
             const damageTypeGroup = document.getElementById('stoveDamageTypeGroup');
             damageTypeGroup.style.display = this.value > 0 ? 'block' : 'none';
         });
+        
+        // إظهار/إخفاء نوع تلف الغسالة العادية عند إدخال عدد التالف
+        document.getElementById('damagedWashersCount').addEventListener('input', function() {
+            const damageTypeGroup = document.getElementById('washerDamageTypeGroup');
+            damageTypeGroup.style.display = this.value > 0 ? 'block' : 'none';
+        });
+        
+        // إظهار/إخفاء نوع تلف الغسالة الهاف عند إدخال عدد التالف
+        document.getElementById('damagedHalfWashersCount').addEventListener('input', function() {
+            const damageTypeGroup = document.getElementById('halfWasherDamageTypeGroup');
+            damageTypeGroup.style.display = this.value > 0 ? 'block' : 'none';
+        });
+        
+        // إدارة الحقول الإضافية عند اختيار "غير ذلك" للغسالة العادية
+        function toggleWasherOther(select) {
+            const otherInput = document.getElementById('washerOther');
+            otherInput.style.display = select.value === 'غير ذلك' ? 'block' : 'none';
+            if(select.value !== 'غير ذلك') otherInput.value = '';
+        }
+        
+        // إدارة الحقول الإضافية عند اختيار "غير ذلك" للغسالة الهاف
+        function toggleHalfWasherOther(select) {
+            const otherInput = document.getElementById('halfWasherOther');
+            otherInput.style.display = select.value === 'غير ذلك' ? 'block' : 'none';
+            if(select.value !== 'غير ذلك') otherInput.value = '';
+        }
     </script>
 </body>
 </html>
