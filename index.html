@@ -248,6 +248,19 @@
                     <label for="damagedFridgesCount" class="damaged-count">عدد التالف منها:</label>
                     <input type="number" id="damagedFridgesCount" min="0" value="0">
                 </div>
+                
+                <div id="fridgeDamageTypeGroup" class="damage-type-group" style="display: none;">
+                    <label for="fridgeDamageType">نوع تلف الثلاجة:</label>
+                    <select id="fridgeDamageType" onchange="toggleFridgeOther(this)">
+                        <option value="موتور">موتور</option>
+                        <option value="برومة">برومة</option>
+                        <option value="باب الثلاجة مكسور">باب الثلاجة مكسور</option>
+                        <option value="غير ذلك">غير ذلك</option>
+                    </select>
+                    <input type="text" id="fridgeOther" class="other-input" 
+                           placeholder="حدد نوع التلف" 
+                           style="display: none; margin-top: 5px;">
+                </div>
             </div>
             
             <div class="form-group" id="medicalConditionsGroup" style="display:none;">
@@ -305,6 +318,10 @@
                     document.getElementById('halfWasherDamageType').value) : '';
             const fridgesCount = parseInt(document.getElementById('fridgesCount').value);
             const damagedFridgesCount = parseInt(document.getElementById('damagedFridgesCount').value);
+            const fridgeDamageType = damagedFridgesCount > 0 ? 
+                (document.getElementById('fridgeDamageType').value === 'غير ذلك' ?
+                    document.getElementById('fridgeOther').value :
+                    document.getElementById('fridgeDamageType').value) : '';
             
             const medicalConditions = document.querySelector('input[name="medicalConditions"]:checked').value === 'yes';
             const smallApartment = document.querySelector('input[name="smallApartment"]:checked').value === 'yes';
@@ -387,7 +404,8 @@
                 (familyType === 'family' && (medicalConditions || familySize >= 7))) {
                 const workingFridges = fridgesCount - damagedFridgesCount;
                 if (workingFridges < 1) {
-                    neededDevices.push('ثلاجة (يحتاج موافقة المدير التنفيذي)');
+                    const damageNote = damagedFridgesCount > 0 ? ` (نوع التلف: ${fridgeDamageType})` : '';
+                    neededDevices.push(`ثلاجة${damageNote} (يحتاج موافقة المدير التنفيذي)`);
                 }
             }
             
@@ -458,6 +476,12 @@
             damageTypeGroup.style.display = this.value > 0 ? 'block' : 'none';
         });
         
+        // إظهار/إخفاء نوع تلف الثلاجة عند إدخال عدد التالف
+        document.getElementById('damagedFridgesCount').addEventListener('input', function() {
+            const damageTypeGroup = document.getElementById('fridgeDamageTypeGroup');
+            damageTypeGroup.style.display = this.value > 0 ? 'block' : 'none';
+        });
+        
         // إدارة الحقول الإضافية عند اختيار "غير ذلك" للغسالة العادية
         function toggleWasherOther(select) {
             const otherInput = document.getElementById('washerOther');
@@ -468,6 +492,13 @@
         // إدارة الحقول الإضافية عند اختيار "غير ذلك" للغسالة الهاف
         function toggleHalfWasherOther(select) {
             const otherInput = document.getElementById('halfWasherOther');
+            otherInput.style.display = select.value === 'غير ذلك' ? 'block' : 'none';
+            if(select.value !== 'غير ذلك') otherInput.value = '';
+        }
+        
+        // إدارة الحقول الإضافية عند اختيار "غير ذلك" للثلاجة
+        function toggleFridgeOther(select) {
+            const otherInput = document.getElementById('fridgeOther');
             otherInput.style.display = select.value === 'غير ذلك' ? 'block' : 'none';
             if(select.value !== 'غير ذلك') otherInput.value = '';
         }
