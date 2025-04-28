@@ -185,11 +185,15 @@
                 
                 <div id="stoveDamageTypeGroup" class="damage-type-group" style="display: none;">
                     <label for="stoveDamageType">نوع تلف البوتجاز:</label>
-                    <select id="stoveDamageType">
+                    <select id="stoveDamageType" onchange="toggleStoveOther(this)">
                         <option value="بيهب">بيهب</option>
                         <option value="بيسرب غاز">بيسرب غاز</option>
                         <option value="برومة">برومة</option>
+                        <option value="غير ذلك">غير ذلك</option>
                     </select>
+                    <input type="text" id="stoveOther" class="other-input" 
+                           placeholder="حدد نوع التلف" 
+                           style="display: none; margin-top: 5px;">
                 </div>
                 
                 <label><input type="checkbox" id="hasOven"> لديهم فرن</label>
@@ -302,7 +306,10 @@
             const damagedMattressesCount = parseInt(document.getElementById('damagedMattressesCount').value);
             const stovesCount = parseInt(document.getElementById('stovesCount').value);
             const damagedStovesCount = parseInt(document.getElementById('damagedStovesCount').value);
-            const stoveDamageType = damagedStovesCount > 0 ? document.getElementById('stoveDamageType').value : '';
+            const stoveDamageType = damagedStovesCount > 0 ? 
+                (document.getElementById('stoveDamageType').value === 'غير ذلك' ?
+                    document.getElementById('stoveOther').value :
+                    document.getElementById('stoveDamageType').value) : '';
             const hasOven = document.getElementById('hasOven').checked;
             const washersCount = parseInt(document.getElementById('washersCount').value);
             const damagedWashersCount = parseInt(document.getElementById('damagedWashersCount').value);
@@ -481,6 +488,13 @@
             const damageTypeGroup = document.getElementById('fridgeDamageTypeGroup');
             damageTypeGroup.style.display = this.value > 0 ? 'block' : 'none';
         });
+        
+        // إدارة الحقول الإضافية عند اختيار "غير ذلك" للبوتجاز
+        function toggleStoveOther(select) {
+            const otherInput = document.getElementById('stoveOther');
+            otherInput.style.display = select.value === 'غير ذلك' ? 'block' : 'none';
+            if(select.value !== 'غير ذلك') otherInput.value = '';
+        }
         
         // إدارة الحقول الإضافية عند اختيار "غير ذلك" للغسالة العادية
         function toggleWasherOther(select) {
