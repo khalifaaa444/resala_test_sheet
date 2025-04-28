@@ -116,6 +116,18 @@
             width: 90%;
             margin-top: 5px;
         }
+        .requests-group label {
+            display: inline-block;
+            margin: 5px 15px 5px 0;
+            padding: 8px;
+            background: #f8f9fa;
+            border-radius: 4px;
+            width: auto;
+        }
+        .requests-group input[type="checkbox"] {
+            width: auto;
+            margin-left: 5px;
+        }
     </style>
 </head>
 <body>
@@ -267,6 +279,22 @@
                 </div>
             </div>
             
+            <div class="form-group requests-group">
+                <h3>الطلبات على لسان الأسرة</h3>
+                <div>
+                    <label><input type="checkbox" name="requests" value="ثلاجة"> ثلاجة</label>
+                    <label><input type="checkbox" name="requests" value="غسالة"> غسالة</label>
+                    <label><input type="checkbox" name="requests" value="بوتجاز"> بوتجاز</label>
+                    <label><input type="checkbox" name="requests" value="سرير"> سرير</label>
+                    <label><input type="checkbox" name="requests" value="مرتبة"> مرتبة</label>
+                    <label><input type="checkbox" name="requests" value="غير ذلك" onchange="toggleOtherRequest(this)"> غير ذلك</label>
+                </div>
+                <input type="text" id="otherRequest" 
+                       class="other-input" 
+                       placeholder="حدد الطلب الآخر"
+                       style="display: none; margin-top: 5px;">
+            </div>
+            
             <div class="form-group" id="medicalConditionsGroup" style="display:none;">
                 <label>هل يوجد أفراد بحاجة لحفظ أدوية (مريض سكر يحتاج أنسولين، أمراض كبد، إلخ)؟</label>
                 <label><input type="radio" name="medicalConditions" value="yes"> نعم</label>
@@ -332,6 +360,15 @@
             
             const medicalConditions = document.querySelector('input[name="medicalConditions"]:checked').value === 'yes';
             const smallApartment = document.querySelector('input[name="smallApartment"]:checked').value === 'yes';
+            
+            // جمع الطلبات المذكورة من الأسرة
+            const requests = Array.from(document.querySelectorAll('input[name="requests"]:checked'))
+                                .map(checkbox => {
+                                    if (checkbox.value === 'غير ذلك') {
+                                        return document.getElementById('otherRequest').value || 'غير ذلك';
+                                    }
+                                    return checkbox.value;
+                                });
             
             // حساب صافي الدخل
             const netIncome = income - expenses;
@@ -427,7 +464,7 @@
             const devicesNeededDiv = document.getElementById('devicesNeeded');
             const ratingText = document.getElementById('ratingText');
             
-            if (neededDevices.length > 0) {
+            if (neededDevices.length > 0 || requests.length > 0) {
                 resultDiv.className = 'result eligible';
                 eligibilityText.textContent = `الأسرة/العروسة ${familyName} مؤهلة للحصول على المساعدات.`;
                 
@@ -438,6 +475,14 @@
                     deviceItem.textContent = device;
                     devicesNeededDiv.appendChild(deviceItem);
                 });
+                
+                // عرض طلبات الأسرة إذا وجدت
+                if (requests.length > 0) {
+                    const requestsItem = document.createElement('div');
+                    requestsItem.className = 'device-item';
+                    requestsItem.textContent = `طلبات الأسرة: ${requests.join('، ')}`;
+                    devicesNeededDiv.appendChild(requestsItem);
+                }
             } else {
                 resultDiv.className = 'result not-eligible';
                 eligibilityText.textContent = `الأسرة/العروسة ${familyName} غير مؤهلة للحصول على مساعدات إضافية.`;
@@ -515,6 +560,13 @@
             const otherInput = document.getElementById('fridgeOther');
             otherInput.style.display = select.value === 'غير ذلك' ? 'block' : 'none';
             if(select.value !== 'غير ذلك') otherInput.value = '';
+        }
+        
+        // إدارة الحقل الإضافي لطلب "غير ذلك"
+        function toggleOtherRequest(checkbox) {
+            const otherInput = document.getElementById('otherRequest');
+            otherInput.style.display = checkbox.checked ? 'block' : 'none';
+            if (!checkbox.checked) otherInput.value = '';
         }
     </script>
 </body>
