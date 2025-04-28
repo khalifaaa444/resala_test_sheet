@@ -375,6 +375,11 @@
     const neededDevices = [];
     const addedDevices = new Set();
 
+    // التحقق من التلف المقبول للبوتجاز
+    const validStoveDamage = stoveDamageType === 'بيسرب غاز' || stoveDamageType === 'برومة';
+    const validDamagedStovesCount = validStoveDamage ? damagedStovesCount : 0;
+    const workingStoves = stovesCount - validDamagedStovesCount;
+
     requests.forEach(request => {
         switch(request.toLowerCase()) {
             case 'سرير':
@@ -400,14 +405,13 @@
                 break;
 
             case 'بوتجاز':
-                let stoveCondition = '';
-                if (damagedStovesCount > 0) stoveCondition = ` (${stoveDamageType})`;
-
+                let stoveCondition = validStoveDamage ? ` (${stoveDamageType})` : '';
                 if ((familyType === 'engaged' || familyType === 'married') && !addedDevices.has('بوتجاز')) {
-                    neededDevices.push(`بوتجاز${stoveCondition}`);
-                    addedDevices.add('بوتجاز');
+                    if (workingStoves < 1) {
+                        neededDevices.push(`بوتجاز${stoveCondition}`);
+                        addedDevices.add('بوتجاز');
+                    }
                 } else if (familyType === 'family' && familySize >= 3) {
-                    const workingStoves = stovesCount - damagedStovesCount;
                     if (workingStoves < 1 && !hasOven && !addedDevices.has('بوتجاز')) {
                         neededDevices.push(`بوتجاز${stoveCondition}`);
                         addedDevices.add('بوتجاز');
@@ -417,9 +421,9 @@
 
             case 'غسالة':
                 if (familyType === 'family') {
+                    const validHalfWasherDamaged = (halfWasherDamageType === 'موتور' || halfWasherDamageType === 'برومة') ? damagedHalfWashersCount : 0;
+                    const workingHalfWashers = halfWashersCount - validHalfWasherDamaged;
                     if ((familySize >= 4 || medicalConditions) && !addedDevices.has('غسالة هاف')) {
-                        const validHalfWasherDamaged = (halfWasherDamageType === 'موتور' || halfWasherDamageType === 'برومة') ? damagedHalfWashersCount : 0;
-                        const workingHalfWashers = halfWashersCount - validHalfWasherDamaged;
                         if (workingHalfWashers < 1) {
                             let damageNote = validHalfWasherDamaged > 0 ? ` (${halfWasherDamageType})` : '';
                             neededDevices.push(`غسالة هاف${damageNote}`);
