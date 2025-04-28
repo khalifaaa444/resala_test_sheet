@@ -320,180 +320,175 @@
 
     <script>
         function evaluateFamily() {
-            // جمع بيانات النموذج
-            const familyType = document.getElementById('familyType').value;
-            const familyName = document.getElementById('familyName').value;
-            const familySize = parseInt(document.getElementById('familySize').value);
-            const income = parseFloat(document.getElementById('income').value);
-            const expenses = parseFloat(document.getElementById('expenses').value);
-            
-            // الأجهزة المتوفرة - الكميات
-            const bedsCount = parseInt(document.getElementById('bedsCount').value);
-            const damagedBedsCount = parseInt(document.getElementById('damagedBedsCount').value);
-            const mattressesCount = parseInt(document.getElementById('mattressesCount').value);
-            const damagedMattressesCount = parseInt(document.getElementById('damagedMattressesCount').value);
-            const stovesCount = parseInt(document.getElementById('stovesCount').value);
-            const damagedStovesCount = parseInt(document.getElementById('damagedStovesCount').value);
-            const stoveDamageType = damagedStovesCount > 0 ? 
-                (document.getElementById('stoveDamageType').value === 'غير ذلك' ?
-                    document.getElementById('stoveOther').value :
-                    document.getElementById('stoveDamageType').value) : '';
-            const hasOven = document.getElementById('hasOven').checked;
-            const washersCount = parseInt(document.getElementById('washersCount').value);
-            const damagedWashersCount = parseInt(document.getElementById('damagedWashersCount').value);
-            const washerDamageType = damagedWashersCount > 0 ? 
-                (document.getElementById('washerDamageType').value === 'غير ذلك' ?
-                    document.getElementById('washerOther').value :
-                    document.getElementById('washerDamageType').value) : '';
-            const halfWashersCount = parseInt(document.getElementById('halfWashersCount').value);
-            const damagedHalfWashersCount = parseInt(document.getElementById('damagedHalfWashersCount').value);
-            const halfWasherDamageType = damagedHalfWashersCount > 0 ? 
-                (document.getElementById('halfWasherDamageType').value === 'غير ذلك' ?
-                    document.getElementById('halfWasherOther').value :
-                    document.getElementById('halfWasherDamageType').value) : '';
-            const fridgesCount = parseInt(document.getElementById('fridgesCount').value);
-            const damagedFridgesCount = parseInt(document.getElementById('damagedFridgesCount').value);
-            const fridgeDamageType = damagedFridgesCount > 0 ? 
-                (document.getElementById('fridgeDamageType').value === 'غير ذلك' ?
-                    document.getElementById('fridgeOther').value :
-                    document.getElementById('fridgeDamageType').value) : '';
-            
-            const medicalConditions = document.querySelector('input[name="medicalConditions"]:checked').value === 'yes';
-            const smallApartment = document.querySelector('input[name="smallApartment"]:checked').value === 'yes';
-            
-            // جمع الطلبات المذكورة من الأسرة
-            const requests = Array.from(document.querySelectorAll('input[name="requests"]:checked'))
-                                .map(checkbox => {
-                                    if (checkbox.value === 'غير ذلك') {
-                                        return document.getElementById('otherRequest').value || 'غير ذلك';
-                                    }
-                                    return checkbox.value;
-                                });
-            
-            // حساب صافي الدخل
-            const netIncome = income - expenses;
-            
-            // تحديد فئة الاستحقاق
-            let rating = 'C';
-            if (netIncome <= 750) rating = 'A';
-            else if (netIncome <= 1500) rating = 'B';
-            
-            // تحديد الأجهزة المطلوبة
-            const neededDevices = [];
-            
-            // 1. تقييم السرير والمرتبة
-            if (familyType === 'family') {
-                const bedsNeeded = Math.ceil(familySize / 2);
-                const workingBeds = bedsCount - damagedBedsCount;
-                const workingMattresses = mattressesCount - damagedMattressesCount;
-                
-                if (smallApartment) {
-                    // إذا كانت الشقة صغيرة، نعطي مراتب بدلاً من الأسرة
-                    const mattressesDeficit = bedsNeeded - workingMattresses;
-                    if (mattressesDeficit > 0) {
-                        neededDevices.push(`مرتبة (${mattressesDeficit} عدد)`);
+        // جمع البيانات الأساسية
+        const familyType = document.getElementById('familyType').value;
+        const familyName = document.getElementById('familyName').value;
+        const familySize = parseInt(document.getElementById('familySize').value);
+        const income = parseFloat(document.getElementById('income').value);
+        const expenses = parseFloat(document.getElementById('expenses').value);
+
+        // جمع بيانات الأجهزة
+        const bedsCount = parseInt(document.getElementById('bedsCount').value);
+        const damagedBedsCount = parseInt(document.getElementById('damagedBedsCount').value);
+        const mattressesCount = parseInt(document.getElementById('mattressesCount').value);
+        const damagedMattressesCount = parseInt(document.getElementById('damagedMattressesCount').value);
+        const stovesCount = parseInt(document.getElementById('stovesCount').value);
+        const damagedStovesCount = parseInt(document.getElementById('damagedStovesCount').value);
+        const stoveDamageType = damagedStovesCount > 0 ? 
+            (document.getElementById('stoveDamageType').value === 'غير ذلك' ?
+                document.getElementById('stoveOther').value :
+                document.getElementById('stoveDamageType').value) : '';
+        const hasOven = document.getElementById('hasOven').checked;
+        const washersCount = parseInt(document.getElementById('washersCount').value);
+        const damagedWashersCount = parseInt(document.getElementById('damagedWashersCount').value);
+        const washerDamageType = damagedWashersCount > 0 ? 
+            (document.getElementById('washerDamageType').value === 'غير ذلك' ?
+                document.getElementById('washerOther').value :
+                document.getElementById('washerDamageType').value) : '';
+        const halfWashersCount = parseInt(document.getElementById('halfWashersCount').value);
+        const damagedHalfWashersCount = parseInt(document.getElementById('damagedHalfWashersCount').value);
+        const halfWasherDamageType = damagedHalfWashersCount > 0 ? 
+            (document.getElementById('halfWasherDamageType').value === 'غير ذلك' ?
+                document.getElementById('halfWasherOther').value :
+                document.getElementById('halfWasherDamageType').value) : '';
+        const fridgesCount = parseInt(document.getElementById('fridgesCount').value);
+        const damagedFridgesCount = parseInt(document.getElementById('damagedFridgesCount').value);
+        const fridgeDamageType = damagedFridgesCount > 0 ? 
+            (document.getElementById('fridgeDamageType').value === 'غير ذلك' ?
+                document.getElementById('fridgeOther').value :
+                document.getElementById('fridgeDamageType').value) : '';
+        
+        const medicalConditions = document.querySelector('input[name="medicalConditions"]:checked').value === 'yes';
+        const smallApartment = document.querySelector('input[name="smallApartment"]:checked').value === 'yes';
+
+        // جمع الطلبات المذكورة
+        const requests = Array.from(document.querySelectorAll('input[name="requests"]:checked'))
+                            .map(checkbox => {
+                                if (checkbox.value === 'غير ذلك') {
+                                    return document.getElementById('otherRequest').value.trim();
+                                }
+                                return checkbox.value;
+                            })
+                            .filter(request => request !== '');
+
+        // تحديد الأجهزة المطلوبة بناءً على الطلبات والشروط
+        const neededDevices = [];
+        const addedDevices = new Set();
+
+        requests.forEach(request => {
+            switch(request.toLowerCase()) {
+                case 'سرير':
+                    if (familyType === 'family' && !smallApartment) {
+                        const requiredBeds = Math.ceil(familySize / 2);
+                        const workingBeds = bedsCount - damagedBedsCount;
+                        if (workingBeds < requiredBeds && !addedDevices.has('سرير')) {
+                            neededDevices.push(`سرير (${requiredBeds - workingBeds} عدد)`);
+                            addedDevices.add('سرير');
+                        }
                     }
-                } else {
-                    // تقييم الأسرة
-                    const bedsDeficit = bedsNeeded - workingBeds;
-                    if (bedsDeficit > 0) {
-                        neededDevices.push(`سرير (${bedsDeficit} عدد)`);
+                    break;
+
+                case 'مرتبة':
+                    if (familyType === 'family') {
+                        const requiredMattresses = Math.ceil(familySize / 2);
+                        const workingMattresses = mattressesCount - damagedMattressesCount;
+                        if (workingMattresses < requiredMattresses && !addedDevices.has('مرتبة')) {
+                            neededDevices.push(`مرتبة (${requiredMattresses - workingMattresses} عدد)`);
+                            addedDevices.add('مرتبة');
+                        }
                     }
-                    
-                    // تقييم المراتب
-                    const mattressesDeficit = bedsNeeded - workingMattresses;
-                    if (mattressesDeficit > 0) {
-                        neededDevices.push(`مرتبة (${mattressesDeficit} عدد)`);
+                    break;
+
+                case 'بوتجاز':
+                    let stoveCondition = '';
+                    if (damagedStovesCount > 0) stoveCondition = ` (${stoveDamageType})`;
+
+                    if ((familyType === 'engaged' || familyType === 'married') && !addedDevices.has('بوتجاز')) {
+                        neededDevices.push(`بوتجاز${stoveCondition}`);
+                        addedDevices.add('بوتجاز');
+                    } else if (familyType === 'family' && familySize >= 3) {
+                        const workingStoves = stovesCount - damagedStovesCount;
+                        if (workingStoves < 1 && !hasOven && !addedDevices.has('بوتجاز')) {
+                            neededDevices.push(`بوتجاز${stoveCondition}`);
+                            addedDevices.add('بوتجاز');
+                        }
                     }
-                }
-            }
-            
-            // 2. تقييم البوتجاز
-            if (familyType === 'family' && familySize >= 3) {
-                const workingStoves = stovesCount - damagedStovesCount;
-                if (workingStoves < 1 && !hasOven) {
-                    if (damagedStovesCount > 0) {
-                        neededDevices.push(`بوتجاز (نوع التلف: ${stoveDamageType})`);
-                    } else {
-                        neededDevices.push('بوتجاز');
+                    break;
+
+                case 'غسالة':
+                    if (familyType === 'family') {
+                        if ((familySize >= 4 || medicalConditions) && !addedDevices.has('غسالة هاف')) {
+                            const workingHalfWashers = halfWashersCount - damagedHalfWashersCount;
+                            if (workingHalfWashers < 1) {
+                                let damageNote = damagedHalfWashersCount > 0 ? ` (${halfWasherDamageType})` : '';
+                                neededDevices.push(`غسالة هاف${damageNote}`);
+                                addedDevices.add('غسالة هاف');
+                            }
+                        } else if (familySize <= 3 && !addedDevices.has('غسالة عادية')) {
+                            const workingWashers = washersCount - damagedWashersCount;
+                            if (workingWashers < 1) {
+                                let damageNote = damagedWashersCount > 0 ? ` (${washerDamageType})` : '';
+                                neededDevices.push(`غسالة عادية${damageNote}`);
+                                addedDevices.add('غسالة عادية');
+                            }
+                        }
                     }
-                }
-            } else if (familyType === 'engaged') {
-                neededDevices.push('بوتجاز أو غسالة عادية (جهاز واحد فقط)');
-            } else if (familyType === 'married') {
-                neededDevices.push('بوتجاز');
-            }
-            
-            // 3. تقييم الغسالات
-            if (familyType === 'family') {
-                if ((familySize >= 2 && familySize <= 3) || (familySize === 1 && familySize > 60)) { // Assuming elderly
-                    const workingWashers = washersCount - damagedWashersCount;
-                    if (workingWashers < 1) {
-                        const damageNote = damagedWashersCount > 0 ? ` (نوع التلف: ${washerDamageType})` : '';
-                        neededDevices.push(`غسالة عادية${damageNote}`);
+                    break;
+
+                case 'ثلاجة':
+                    if (((familyType === 'married') || 
+                        (familyType === 'family' && (medicalConditions || familySize >= 7))) &&
+                        !addedDevices.has('ثلاجة')) {
+                        const workingFridges = fridgesCount - damagedFridgesCount;
+                        if (workingFridges < 1) {
+                            let damageNote = damagedFridgesCount > 0 ? ` (${fridgeDamageType})` : '';
+                            neededDevices.push(`ثلاجة${damageNote} (موافقة مدير)`);
+                            addedDevices.add('ثلاجة');
+                        }
                     }
-                } else if (familySize >= 4) {
-                    const workingHalfWashers = halfWashersCount - damagedHalfWashersCount;
-                    if (workingHalfWashers < 1) {
-                        const damageNote = damagedHalfWashersCount > 0 ? ` (نوع التلف: ${halfWasherDamageType})` : '';
-                        neededDevices.push(`غسالة هاف${damageNote}`);
+                    break;
+
+                default:
+                    if (!addedDevices.has(request)) {
+                        neededDevices.push(request);
+                        addedDevices.add(request);
                     }
-                }
-            } else if (familyType === 'married') {
-                neededDevices.push('غسالة هاف');
+                    break;
             }
-            
-            // 4. تقييم الثلاجة
-            if ((familyType === 'married') || 
-                (familyType === 'family' && (medicalConditions || familySize >= 7))) {
-                const workingFridges = fridgesCount - damagedFridgesCount;
-                if (workingFridges < 1) {
-                    const damageNote = damagedFridgesCount > 0 ? ` (نوع التلف: ${fridgeDamageType})` : '';
-                    neededDevices.push(`ثلاجة${damageNote} (يحتاج موافقة المدير التنفيذي)`);
-                }
-            }
-            
-            // 5. إضافة لحاف للعروسات
-            if (familyType === 'engaged' || familyType === 'married') {
-                neededDevices.push('لحاف');
-            }
-            
-            // عرض النتائج
-            const resultDiv = document.getElementById('result');
-            const eligibilityText = document.getElementById('eligibilityText');
-            const devicesNeededDiv = document.getElementById('devicesNeeded');
-            const ratingText = document.getElementById('ratingText');
-            
-            if (neededDevices.length > 0 || requests.length > 0) {
-                resultDiv.className = 'result eligible';
-                eligibilityText.textContent = `الأسرة/العروسة ${familyName} مؤهلة للحصول على المساعدات.`;
-                
-                devicesNeededDiv.innerHTML = '<h3>الأجهزة المطلوبة:</h3>';
-                neededDevices.forEach(device => {
-                    const deviceItem = document.createElement('div');
-                    deviceItem.className = 'device-item';
-                    deviceItem.textContent = device;
-                    devicesNeededDiv.appendChild(deviceItem);
-                });
-                
-                // عرض طلبات الأسرة إذا وجدت
-                if (requests.length > 0) {
-                    const requestsItem = document.createElement('div');
-                    requestsItem.className = 'device-item';
-                    requestsItem.textContent = `طلبات الأسرة: ${requests.join('، ')}`;
-                    devicesNeededDiv.appendChild(requestsItem);
-                }
-            } else {
-                resultDiv.className = 'result not-eligible';
-                eligibilityText.textContent = `الأسرة/العروسة ${familyName} غير مؤهلة للحصول على مساعدات إضافية.`;
-                devicesNeededDiv.innerHTML = '';
-            }
-            
-            ratingText.textContent = `تصنيف الاستحقاق: ${rating}`;
-            ratingText.className = `rating ${rating}`;
-            
-            resultDiv.style.display = 'block';
+        });
+
+        // حساب تصنيف الاستحقاق
+        const netIncome = income - expenses;
+        let rating = 'C';
+        if (netIncome <= 750) rating = 'A';
+        else if (netIncome <= 1500) rating = 'B';
+
+        // عرض النتائج
+        const resultDiv = document.getElementById('result');
+        const eligibilityText = document.getElementById('eligibilityText');
+        const devicesNeededDiv = document.getElementById('devicesNeeded');
+        const ratingText = document.getElementById('ratingText');
+
+        if (neededDevices.length > 0) {
+            resultDiv.className = 'result eligible';
+            eligibilityText.textContent = `الأسرة/العروسة ${familyName} مؤهلة للحصول على المساعدات.`;
+            devicesNeededDiv.innerHTML = '<h3>الأجهزة المعتمدة:</h3>';
+            neededDevices.forEach(device => {
+                const deviceItem = document.createElement('div');
+                deviceItem.className = 'device-item';
+                deviceItem.textContent = device;
+                devicesNeededDiv.appendChild(deviceItem);
+            });
+        } else {
+            resultDiv.className = 'result not-eligible';
+            eligibilityText.textContent = `الأسرة/العروسة ${familyName} غير مؤهلة بناءً على الطلبات المقدمة.`;
+            devicesNeededDiv.innerHTML = '';
         }
+
+        ratingText.textContent = `التصنيف: ${rating}`;
+        ratingText.className = `rating ${rating}`;
+        resultDiv.style.display = 'block';
+    }
         
         // إظهار/إخفاء الحقول حسب نوع الأسرة
         document.getElementById('familyType').addEventListener('change', function() {
