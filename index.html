@@ -849,7 +849,24 @@ textarea {
                                 <label for="apartmentNo">لا</label>
                             </div>
                         </div>
-                    </div>           
+                    </div>   
+
+
+                    <div class="form-group" id="liverDiabetesGroup" style="display:none;">
+                        <label>هل تعاني الأسرة من أمراض الكبد أو السكر التي تتطلب حفظ أدوية في الثلاجة؟</label>
+                        <div class="radio-group">
+                            <div class="radio-item">
+                                <input type="radio" name="liverDiabetes" value="yes" id="liverDiabetesYes">
+                                <label for="liverDiabetesYes">نعم</label>
+                            </div>
+                            <div class="radio-item">
+                                <input type="radio" name="liverDiabetes" value="no" id="liverDiabetesNo" checked>
+                                <label for="liverDiabetesNo">لا</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    
                 </div>
                 
                 <div id="purchasedItemsGroup" class="form-group">
@@ -993,9 +1010,30 @@ textarea {
             otherInput.style.display = checkbox.checked ? 'block' : 'none';
             if (!checkbox.checked) otherInput.querySelector('input').value = '';
         }
+
+        function toggleLiverDiabetesGroup() {
+    const familyType = document.getElementById('familyType').value;
+    const fridgeRequested = document.getElementById('requestFridge').checked;
+    const liverDiabetesGroup = document.getElementById('liverDiabetesGroup');
+    
+    if (familyType === 'family' && fridgeRequested) {
+        liverDiabetesGroup.style.display = 'block';
+    } else {
+        liverDiabetesGroup.style.display = 'none';
+        // إعادة تعيين القيم عند الإخفاء
+        document.getElementById('liverDiabetesNo').checked = true;
+    }
+}
+
+// إضافة مستمعي الأحداث
+document.getElementById('familyType').addEventListener('change', toggleLiverDiabetesGroup);
+document.getElementById('requestFridge').addEventListener('change', toggleLiverDiabetesGroup);
         
         // دالة تقييم الأسرة
 function evaluateFamily() {
+
+
+    
     // Collect basic data
     const familyType = document.getElementById('familyType').value;
     const familyName = document.getElementById('familyName').value;
@@ -1103,6 +1141,14 @@ function evaluateFamily() {
     let ratingText = 'منخفض';
     let progressWidth = 30;
     let additionalNotes = '';
+
+        // داخل دالة evaluateFamily
+const hasLiverDiabetes = document.querySelector('input[name="liverDiabetes"]:checked')?.value === 'yes';
+
+// في قسم الملاحظات الإضافية
+if (hasLiverDiabetes) {
+    additionalNotes += ' - يوجد أفراد بحاجة لحفظ أدوية في الثلاجة';
+}
 
     if (netIncome <= 750) {
         rating = 'A';
