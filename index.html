@@ -85,6 +85,10 @@ textarea {
     resize: vertical;
 }
 
+#purchasedItemsGroup {
+    display: none;
+}
+        
 #providerGroup {
     margin-top: 15px;
     padding-top: 15px;
@@ -845,13 +849,14 @@ textarea {
                                 <label for="apartmentNo">لا</label>
                             </div>
                         </div>
-                    </div>
+                    </div>           
                 </div>
-                <!-- قبل زر التقييم -->
-                <div class="form-group">
+                
+                <div id="purchasedItemsGroup" class="form-group">
                     <label for="purchasedItems">ما تم شراؤه بالفعل:</label>
                     <textarea id="purchasedItems" rows="3" placeholder="أدخل الأغراض التي تم شراؤها مسبقاً"></textarea>
                 </div>
+               
                 <button type="button" onclick="evaluateFamily()">
                     <i class="fas fa-calculator"></i> تقييم الاستحقاق
                 </button>
@@ -898,27 +903,36 @@ textarea {
     <script>
         // إظهار/إخفاء الحقول حسب نوع الأسرة
         document.getElementById('familyType').addEventListener('change', function() {
+
             const familyType = this.value;
     const providerGroup = document.getElementById('providerGroup');
+    const purchasedItemsGroup = document.getElementById('purchasedItemsGroup');
+   
+     const medicalConditionsGroup = document.getElementById('medicalConditionsGroup');
+    const smallApartmentGroup = document.getElementById('smallApartmentGroup');
     
-    // إظهار حقل العائل للعروسة فقط
+    // إظهار حقل العائل وما تم شراؤه للعروسة فقط
     if (familyType === 'engaged' || familyType === 'married') {
         providerGroup.style.display = 'block';
+        purchasedItemsGroup.style.display = 'block';
     } else {
         providerGroup.style.display = 'none';
+        purchasedItemsGroup.style.display = 'none';
     }
+    
+    if (familyType === 'family') {
+        medicalConditionsGroup.style.display = 'block';
+        smallApartmentGroup.style.display = 'block';
+    } else {
+        medicalConditionsGroup.style.display = 'none';
+        smallApartmentGroup.style.display = 'none';
+    }
+
             
             
-            const medicalConditionsGroup = document.getElementById('medicalConditionsGroup');
-            const smallApartmentGroup = document.getElementById('smallApartmentGroup');
+           
             
-            if (familyType === 'family') {
-                medicalConditionsGroup.style.display = 'block';
-                smallApartmentGroup.style.display = 'block';
-            } else {
-                medicalConditionsGroup.style.display = 'none';
-                smallApartmentGroup.style.display = 'none';
-            }
+            
         });
         
         // إظهار/إخفاء نوع تلف البوتجاز عند إدخال عدد التالف
