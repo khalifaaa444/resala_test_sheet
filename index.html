@@ -7,7 +7,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
-        
         :root {
             --primary: #4361ee;
             --primary-light: #4895ef;
@@ -79,26 +78,6 @@
             background: linear-gradient(90deg, transparent 0%, rgba(0, 0, 0, 0.1) 50%, transparent 100%);
         }
 
-        /* إضافة تنسيقات للحقول الجديدة */
-textarea {
-    min-height: 100px;
-    resize: vertical;
-}
-
-#purchasedItemsGroup {
-    display: none;
-}
-        
-#providerGroup {
-    margin-top: 15px;
-    padding-top: 15px;
-    border-top: 1px solid #eee;
-}
-
-.fa-shopping-cart {
-    color: var(--success);
-}
-        
         h1 {
             color: var(--primary);
             font-size: 2.2rem;
@@ -608,21 +587,6 @@ textarea {
                         <label for="familyName" class="required">اسم الأسرة / العروسة:</label>
                         <input type="text" id="familyName" required placeholder="أدخل اسم الأسرة أو العروسة">
                     </div>
-
-                    <!-- بعد حقل اسم العروسة -->
-                    <div id="providerGroup" class="form-group" style="display: none;">
-                        <label>هل يوجد عائل للعروسة؟</label>
-                        <div class="radio-group">
-                            <div class="radio-item">
-                                <input type="radio" name="hasProvider" value="yes" id="providerYes">
-                                <label for="providerYes">نعم</label>
-                            </div>
-                         <div class="radio-item">
-                                <input type="radio" name="hasProvider" value="no" id="providerNo" checked>
-                                <label for="providerNo">لا</label>
-                            </div>
-                        </div>
-                    </div>
                     
                     <div class="form-group">
                         <label for="familySize" class="required">عدد أفراد الأسرة:</label>
@@ -849,14 +813,9 @@ textarea {
                                 <label for="apartmentNo">لا</label>
                             </div>
                         </div>
-                    </div>           
+                    </div>
                 </div>
                 
-                <div id="purchasedItemsGroup" class="form-group">
-                    <label for="purchasedItems">ما تم شراؤه بالفعل:</label>
-                    <textarea id="purchasedItems" rows="3" placeholder="أدخل الأغراض التي تم شراؤها مسبقاً"></textarea>
-                </div>
-               
                 <button type="button" onclick="evaluateFamily()">
                     <i class="fas fa-calculator"></i> تقييم الاستحقاق
                 </button>
@@ -903,36 +862,17 @@ textarea {
     <script>
         // إظهار/إخفاء الحقول حسب نوع الأسرة
         document.getElementById('familyType').addEventListener('change', function() {
-
             const familyType = this.value;
-    const providerGroup = document.getElementById('providerGroup');
-    const purchasedItemsGroup = document.getElementById('purchasedItemsGroup');
-   
-     const medicalConditionsGroup = document.getElementById('medicalConditionsGroup');
-    const smallApartmentGroup = document.getElementById('smallApartmentGroup');
-    
-    // إظهار حقل العائل وما تم شراؤه للعروسة فقط
-    if (familyType === 'engaged' || familyType === 'married') {
-        providerGroup.style.display = 'block';
-        purchasedItemsGroup.style.display = 'block';
-    } else {
-        providerGroup.style.display = 'none';
-        purchasedItemsGroup.style.display = 'none';
-    }
-    
-    if (familyType === 'family') {
-        medicalConditionsGroup.style.display = 'block';
-        smallApartmentGroup.style.display = 'block';
-    } else {
-        medicalConditionsGroup.style.display = 'none';
-        smallApartmentGroup.style.display = 'none';
-    }
-
+            const medicalConditionsGroup = document.getElementById('medicalConditionsGroup');
+            const smallApartmentGroup = document.getElementById('smallApartmentGroup');
             
-            
-           
-            
-            
+            if (familyType === 'family') {
+                medicalConditionsGroup.style.display = 'block';
+                smallApartmentGroup.style.display = 'block';
+            } else {
+                medicalConditionsGroup.style.display = 'none';
+                smallApartmentGroup.style.display = 'none';
+            }
         });
         
         // إظهار/إخفاء نوع تلف البوتجاز عند إدخال عدد التالف
@@ -995,184 +935,229 @@ textarea {
         }
         
         // دالة تقييم الأسرة
-function evaluateFamily() {
-    // Collect basic data
-    const familyType = document.getElementById('familyType').value;
-    const familyName = document.getElementById('familyName').value;
-    const familySize = parseInt(document.getElementById('familySize').value);
-    const income = parseFloat(document.getElementById('income').value);
-    const expenses = parseFloat(document.getElementById('expenses').value);
+        function evaluateFamily() {
+            // جمع البيانات الأساسية
+            const familyType = document.getElementById('familyType').value;
+            const familyName = document.getElementById('familyName').value;
+            const familySize = parseInt(document.getElementById('familySize').value);
+            const income = parseFloat(document.getElementById('income').value);
+            const expenses = parseFloat(document.getElementById('expenses').value);
 
-    // Collect device data
-    const bedsCount = parseInt(document.getElementById('bedsCount').value);
-    const damagedBedsCount = parseInt(document.getElementById('damagedBedsCount').value);
-    const mattressesCount = parseInt(document.getElementById('mattressesCount').value);
-    const damagedMattressesCount = parseInt(document.getElementById('damagedMattressesCount').value);
-    const stovesCount = parseInt(document.getElementById('stovesCount').value);
-    const damagedStovesCount = parseInt(document.getElementById('damagedStovesCount').value);
-    const stoveDamageType =
-        damagedStovesCount > 0
-            ? document.getElementById('stoveDamageType').value === 'غير ذلك'
-                ? document.getElementById('stoveOther').querySelector('input').value
-                : document.getElementById('stoveDamageType').value
-            : '';
-    const hasOven = document.getElementById('hasOven').checked;
-    const washersCount = parseInt(document.getElementById('washersCount').value);
-    const damagedWashersCount = parseInt(document.getElementById('damagedWashersCount').value);
-    const washerDamageType =
-        damagedWashersCount > 0
-            ? document.getElementById('washerDamageType').value === 'غير ذلك'
-                ? document.getElementById('washerOther').querySelector('input').value
-                : document.getElementById('washerDamageType').value
-            : '';
+            // جمع بيانات الأجهزة
+            const bedsCount = parseInt(document.getElementById('bedsCount').value);
+            const damagedBedsCount = parseInt(document.getElementById('damagedBedsCount').value);
+            const mattressesCount = parseInt(document.getElementById('mattressesCount').value);
+            const damagedMattressesCount = parseInt(document.getElementById('damagedMattressesCount').value);
+            const stovesCount = parseInt(document.getElementById('stovesCount').value);
+            const damagedStovesCount = parseInt(document.getElementById('damagedStovesCount').value);
+            const stoveDamageType = damagedStovesCount > 0 ? 
+                (document.getElementById('stoveDamageType').value === 'غير ذلك' ?
+                    document.getElementById('stoveOther').querySelector('input').value :
+                    document.getElementById('stoveDamageType').value) : '';
+            const hasOven = document.getElementById('hasOven').checked;
+            const washersCount = parseInt(document.getElementById('washersCount').value);
+            const damagedWashersCount = parseInt(document.getElementById('damagedWashersCount').value);
+            const washerDamageType = damagedWashersCount > 0 ? 
+                (document.getElementById('washerDamageType').value === 'غير ذلك' ?
+                    document.getElementById('washerOther').querySelector('input').value :
+                    document.getElementById('washerDamageType').value) : '';
+            const halfWashersCount = parseInt(document.getElementById('halfWashersCount').value);
+            const damagedHalfWashersCount = parseInt(document.getElementById('damagedHalfWashersCount').value);
+            const halfWasherDamageType = damagedHalfWashersCount > 0 ? 
+                (document.getElementById('halfWasherDamageType').value === 'غير ذلك' ?
+                    document.getElementById('halfWasherOther').querySelector('input').value :
+                    document.getElementById('halfWasherDamageType').value) : '';
+            const fridgesCount = parseInt(document.getElementById('fridgesCount').value);
+            const damagedFridgesCount = parseInt(document.getElementById('damagedFridgesCount').value);
+            const fridgeDamageType = damagedFridgesCount > 0 ? 
+                (document.getElementById('fridgeDamageType').value === 'غير ذلك' ?
+                    document.getElementById('fridgeOther').querySelector('input').value :
+                    document.getElementById('fridgeDamageType').value) : '';
+            
+            const medicalConditions = document.querySelector('input[name="medicalConditions"]:checked').value === 'yes';
+            const smallApartment = document.querySelector('input[name="smallApartment"]:checked').value === 'yes';
 
-    // Collect requests with custom flag
-    const requests = Array.from(document.querySelectorAll('input[name="requests"]:checked'))
-        .map(checkbox => {
-            if (checkbox.value === 'غير ذلك') {
-                const value = document.getElementById('otherRequest').querySelector('input').value.trim();
-                return { value, isCustom: true };
+            // جمع الطلبات المذكورة
+            const requests = Array.from(document.querySelectorAll('input[name="requests"]:checked'))
+                            .map(checkbox => {
+                                if (checkbox.value === 'غير ذلك') {
+                                    return document.getElementById('otherRequest').querySelector('input').value.trim();
+                                }
+                                return checkbox.value;
+                            })
+                            .filter(request => request !== '');
+
+            // تحديد الأجهزة المطلوبة بناءً على الطلبات والشروط
+            const neededDevices = [];
+            const addedDevices = new Set();
+
+            // التحقق من التلف المقبول للبوتجاز
+            const validStoveDamage = stoveDamageType === 'بيسرب غاز' || stoveDamageType === 'برومة';
+            const validDamagedStovesCount = validStoveDamage ? damagedStovesCount : 0;
+            const workingStoves = stovesCount - validDamagedStovesCount;
+
+            requests.forEach(request => {
+                switch(request.toLowerCase()) {
+                    case 'سرير':
+                        if (familyType === 'family' && !smallApartment) {
+                            const requiredBeds = Math.ceil(familySize / 2);
+                            const workingBeds = bedsCount - damagedBedsCount;
+                            if (workingBeds < requiredBeds && !addedDevices.has('سرير')) {
+                                neededDevices.push(`سرير (${requiredBeds - workingBeds} عدد)`);
+                                addedDevices.add('سرير');
+                            }
+                        }
+                        break;
+
+                    case 'مرتبة':
+                        if (familyType === 'family') {
+                            const requiredMattresses = Math.ceil(familySize / 2);
+                            const workingMattresses = mattressesCount - damagedMattressesCount;
+                            if (workingMattresses < requiredMattresses && !addedDevices.has('مرتبة')) {
+                                neededDevices.push(`مرتبة (${requiredMattresses - workingMattresses} عدد)`);
+                                addedDevices.add('مرتبة');
+                            }
+                        }
+                        break;
+
+                    case 'بوتجاز':
+                        let stoveCondition = validStoveDamage ? ` (${stoveDamageType})` : '';
+                        if ((familyType === 'engaged' || familyType === 'married') && !addedDevices.has('بوتجاز')) {
+                            if (workingStoves < 1) {
+                                neededDevices.push(`بوتجاز${stoveCondition}`);
+                                addedDevices.add('بوتجاز');
+                            }
+                        } else if (familyType === 'family' && familySize >= 3) {
+                            if (workingStoves < 1 && !hasOven && !addedDevices.has('بوتجاز')) {
+                                neededDevices.push(`بوتجاز${stoveCondition}`);
+                                addedDevices.add('بوتجاز');
+                            }
+                        }
+                        break;
+
+                    case 'غسالة':
+                        if (familyType === 'family') {
+                            const validHalfWasherDamaged = (halfWasherDamageType === 'موتور' || halfWasherDamageType === 'برومة') ? damagedHalfWashersCount : 0;
+                            const workingHalfWashers = halfWashersCount - validHalfWasherDamaged;
+                            if ((familySize >= 4 || medicalConditions) && !addedDevices.has('غسالة هاف')) {
+                                if (workingHalfWashers < 1) {
+                                    let damageNote = validHalfWasherDamaged > 0 ? ` (${halfWasherDamageType})` : '';
+                                    neededDevices.push(`غسالة هاف${damageNote}`);
+                                    addedDevices.add('غسالة هاف');
+                                }
+                            } else if (familySize <= 3 && !addedDevices.has('غسالة عادية')) {
+                                const validWasherDamaged = (washerDamageType === 'موتور' || washerDamageType === 'برومة') ? damagedWashersCount : 0;
+                                const workingWashers = washersCount - validWasherDamaged;
+                                if (workingWashers < 1) {
+                                    let damageNote = validWasherDamaged > 0 ? ` (${washerDamageType})` : '';
+                                    neededDevices.push(`غسالة عادية${damageNote}`);
+                                    addedDevices.add('غسالة عادية');
+                                }
+                            }
+                        }
+                        break;
+
+                    case 'ثلاجة':
+                        if (((familyType === 'married') || 
+                            (familyType === 'family' && (medicalConditions || familySize >= 7))) &&
+                            !addedDevices.has('ثلاجة')) {
+                            const validFridgeDamaged = (fridgeDamageType === 'موتور' || fridgeDamageType === 'برومة') ? damagedFridgesCount : 0;
+                            const workingFridges = fridgesCount - validFridgeDamaged;
+                            if (workingFridges < 1) {
+                                let damageNote = validFridgeDamaged > 0 ? ` (${fridgeDamageType})` : '';
+                                neededDevices.push(`ثلاجة${damageNote} (موافقة مدير)`);
+                                addedDevices.add('ثلاجة');
+                            }
+                        }
+                        break;
+
+                    default:
+                        if (!addedDevices.has(request)) {
+                            neededDevices.push(request);
+                            addedDevices.add(request);
+                        }
+                        break;
+                }
+            });
+
+            // حساب تصنيف الاستحقاق
+            const netIncome = income - expenses;
+            let rating = 'C';
+            let ratingText = 'منخفض';
+            let progressWidth = 30;
+            let additionalNotes = '';
+            
+            if (netIncome <= 750) {
+                rating = 'A';
+                ratingText = 'عالي جداً';
+                progressWidth = 90;
+                additionalNotes = 'الأسرة في حاجة ماسة للمساعدة بناءً على الدخل المنخفض';
+            } else if (netIncome <= 1500) {
+                rating = 'B';
+                ratingText = 'متوسط';
+                progressWidth = 60;
+                additionalNotes = 'الأسرة في حاجة للمساعدة ولكن ليست في حالة طارئة';
             } else {
-                return { value: checkbox.value, isCustom: false };
+                additionalNotes = 'الأسرة لديها دخل كافٍ نسبياً، يمكن النظر في حالات خاصة';
             }
-        })
-        .filter(request => request.value !== ''); // Ignore empty requests
 
-    // Determine needed devices
-    const neededDevices = [];
-    const addedDevices = new Set();
+            // عرض النتائج
+            const resultDiv = document.getElementById('result');
+            const eligibilityText = document.getElementById('eligibilityText');
+            const additionalNotesEl = document.getElementById('additionalNotes');
+            const devicesNeededDiv = document.getElementById('devicesNeeded');
+            const ratingBadge = document.getElementById('ratingBadge');
+            const ratingCircle = document.getElementById('ratingCircle');
+            const progressBar = document.getElementById('progressBar');
+            const eligibilityStatus = document.getElementById('eligibilityStatus');
 
-    requests.forEach(requestObj => {
-        const request = requestObj.value;
-        const isCustom = requestObj.isCustom;
-
-        if (isCustom) {
-            // Add custom requests directly without conditions
-            if (!addedDevices.has(request)) {
-                neededDevices.push(request);
-                addedDevices.add(request);
+            if (neededDevices.length > 0) {
+                eligibilityStatus.className = 'eligibility-status eligible';
+                eligibilityStatus.innerHTML = `
+                    <i class="fas fa-check-circle" style="color: #28a745; font-size: 1.5rem;"></i>
+                    <div>
+                        <p>الأسرة/العروسة <strong>${familyName}</strong> مؤهلة للحصول على المساعدات.</p>
+                        <p style="margin-top: 10px; font-size: 0.95rem;">${additionalNotes}</p>
+                    </div>
+                `;
+                
+                devicesNeededDiv.innerHTML = `
+                    <h3><i class="fas fa-box-open"></i> الأجهزة المعتمدة:</h3>
+                    ${neededDevices.map(device => `
+                        <div class="device-item">
+                            <i class="fas fa-check-circle"></i>
+                            <span>${device}</span>
+                        </div>
+                    `).join('')}
+                `;
+            } else {
+                eligibilityStatus.className = 'eligibility-status not-eligible';
+                eligibilityStatus.innerHTML = `
+                    <i class="fas fa-times-circle" style="color: #dc3545; font-size: 1.5rem;"></i>
+                    <div>
+                        <p>الأسرة/العروسة <strong>${familyName}</strong> غير مؤهلة بناءً على الطلبات المقدمة.</p>
+                        <p style="margin-top: 10px; font-size: 0.95rem;">${additionalNotes}</p>
+                    </div>
+                `;
+                devicesNeededDiv.innerHTML = '';
             }
-        } else {
-            // Process predefined requests with existing logic
-            switch (request.toLowerCase()) {
-                case 'سرير':
-                    const requiredBeds = Math.ceil(familySize / 2);
-                    const workingBeds = bedsCount - damagedBedsCount;
-                    if (workingBeds < requiredBeds && !addedDevices.has('سرير')) {
-                        neededDevices.push(`سرير (${requiredBeds - workingBeds} عدد)`);
-                        addedDevices.add('سرير');
-                    }
-                    break;
 
-                case 'مرتبة':
-                    const requiredMattresses = Math.ceil(familySize / 2);
-                    const workingMattresses = mattressesCount - damagedMattressesCount;
-                    if (workingMattresses < requiredMattresses && !addedDevices.has('مرتبة')) {
-                        neededDevices.push(`مرتبة (${requiredMattresses - workingMattresses} عدد)`);
-                        addedDevices.add('مرتبة');
-                    }
-                    break;
-
-                // Add other cases for predefined requests as necessary
-
-                default:
-                    if (!addedDevices.has(request)) {
-                        neededDevices.push(request);
-                        addedDevices.add(request);
-                    }
-                    break;
-            }
+            ratingBadge.textContent = rating;
+            ratingBadge.className = `rating-badge ${rating}`;
+            
+            ratingCircle.className = `rating-circle ${rating}`;
+            ratingCircle.innerHTML = `
+                <div class="letter">${rating}</div>
+                <div class="text">${ratingText}</div>
+            `;
+            
+            progressBar.style.width = `${progressWidth}%`;
+            
+            resultDiv.style.display = 'block';
+            
+            // Scroll to results
+            resultDiv.scrollIntoView({ behavior: 'smooth' });
         }
-    });
-
-    // Collect new data
-    const hasProvider = document.querySelector('input[name="hasProvider"]:checked')?.value === 'yes';
-    const purchasedItems = document.getElementById('purchasedItems').value;
-
-    // Add check for provider
-    if ((familyType === 'engaged' || familyType === 'married') && !hasProvider) {
-        if (!addedDevices.has('الدعم المالي')) {
-            neededDevices.push('الدعم المالي (عدم وجود عائل)');
-            addedDevices.add('الدعم المالي');
-        }
-    }
-
-    // Calculate eligibility rating and display results (existing logic)
-    const netIncome = income - expenses;
-    let rating = 'C';
-    let ratingText = 'منخفض';
-    let progressWidth = 30;
-    let additionalNotes = '';
-
-    if (netIncome <= 750) {
-        rating = 'A';
-        ratingText = 'عالي جداً';
-        progressWidth = 90;
-        additionalNotes = 'الأسرة في حاجة ماسة للمساعدة بناءً على الدخل المنخفض';
-    } else if (netIncome <= 1500) {
-        rating = 'B';
-        ratingText = 'متوسط';
-        progressWidth = 60;
-        additionalNotes = 'الأسرة في حاجة للمساعدة ولكن ليست في حالة طارئة';
-    } else {
-        additionalNotes = 'الأسرة لديها دخل كافٍ نسبياً، يمكن النظر في حالات خاصة';
-    }
-
-    // Display results
-    const resultDiv = document.getElementById('result');
-    const eligibilityStatus = document.getElementById('eligibilityStatus');
-    const devicesNeededDiv = document.getElementById('devicesNeeded');
-
-    let purchasedItemsHTML = '';
-    if (purchasedItems) {
-        purchasedItemsHTML = `
-            <h3><i class="fas fa-shopping-cart"></i> الأغراض المشتراة مسبقاً:</h3>
-            <div class="device-item">
-                <i class="fas fa-check-circle"></i>
-                <span>${purchasedItems}</span>
-            </div>
-        `;
-    }
-
-    if (neededDevices.length > 0) {
-        eligibilityStatus.className = 'eligibility-status eligible';
-        eligibilityStatus.innerHTML = `
-            <i class="fas fa-check-circle" style="color: #28a745; font-size: 1.5rem;"></i>
-            <div>
-                <p>الأسرة/العروسة <strong>${familyName}</strong> مؤهلة للحصول على المساعدات.</p>
-                <p style="margin-top: 10px; font-size: 0.95rem;">${additionalNotes}</p>
-            </div>
-        `;
-
-        devicesNeededDiv.innerHTML = `
-            <h3><i class="fas fa-box-open"></i> الأجهزة المعتمدة:</h3>
-            ${neededDevices
-                .map(
-                    device => `
-                <div class="device-item">
-                    <i class="fas fa-check-circle"></i>
-                    <span>${device}</span>
-                </div>
-            `
-                )
-                .join('')}
-            ${purchasedItemsHTML}
-        `;
-    } else {
-        eligibilityStatus.className = 'eligibility-status not-eligible';
-        eligibilityStatus.innerHTML = `
-            <i class="fas fa-times-circle" style="color: #dc3545; font-size: 1.5rem;"></i>
-            <div>
-                <p>الأسرة/العروسة <strong>${familyName}</strong> غير مؤهلة بناءً على الطلبات المقدمة.</p>
-                <p style="margin-top: 10px; font-size: 0.95rem;">${additionalNotes}</p>
-            </div>
-        `;
-        devicesNeededDiv.innerHTML = purchasedItemsHTML;
-    }
-
-    resultDiv.style.display = 'block';
-    resultDiv.scrollIntoView({ behavior: 'smooth' });
-}
     </script>
 </body>
 </html>
