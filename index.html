@@ -996,8 +996,6 @@ textarea {
         
         // دالة تقييم الأسرة
 function evaluateFamily() {
-
-
     // Collect basic data
     const familyType = document.getElementById('familyType').value;
     const familyName = document.getElementById('familyName').value;
@@ -1012,90 +1010,6 @@ function evaluateFamily() {
     const damagedMattressesCount = parseInt(document.getElementById('damagedMattressesCount').value);
     const stovesCount = parseInt(document.getElementById('stovesCount').value);
     const damagedStovesCount = parseInt(document.getElementById('damagedStovesCount').value);
-    const washersCount = parseInt(document.getElementById('washersCount').value);
-    const damagedWashersCount = parseInt(document.getElementById('damagedWashersCount').value);
-    const halfWashersCount = parseInt(document.getElementById('halfWashersCount').value);
-    const damagedHalfWashersCount = parseInt(document.getElementById('damagedHalfWashersCount').value);
-    const fridgesCount = parseInt(document.getElementById('fridgesCount').value);
-    const damagedFridgesCount = parseInt(document.getElementById('damagedFridgesCount').value);
-
-    // Collect requests
-    const requests = Array.from(document.querySelectorAll('input[name="requests"]:checked'))
-        .map(checkbox => checkbox.value);
-
-    // Determine needed devices
-    const neededDevices = [];
-
-    requests.forEach(request => {
-        switch (request.toLowerCase()) {
-            case 'سرير':
-                if (bedsCount > damagedBedsCount) {
-                    // الأسرة غير مستحقة لهذا الطلب
-                    break;
-                }
-                const requiredBeds = Math.ceil(familySize / 2);
-                const workingBeds = bedsCount - damagedBedsCount;
-                if (workingBeds < requiredBeds) {
-                    neededDevices.push(`سرير (${requiredBeds - workingBeds} عدد)`);
-                }
-                break;
-
-            case 'مرتبة':
-                if (mattressesCount > damagedMattressesCount) {
-                    // الأسرة غير مستحقة لهذا الطلب
-                    break;
-                }
-                const requiredMattresses = Math.ceil(familySize / 2);
-                const workingMattresses = mattressesCount - damagedMattressesCount;
-                if (workingMattresses < requiredMattresses) {
-                    neededDevices.push(`مرتبة (${requiredMattresses - workingMattresses} عدد)`);
-                }
-                break;
-
-            case 'بوتجاز':
-                if (stovesCount > damagedStovesCount) {
-                    // الأسرة غير مستحقة لهذا الطلب
-                    break;
-                }
-                neededDevices.push('بوتجاز');
-                break;
-
-            case 'غسالة':
-                if (washersCount > damagedWashersCount) {
-                    // الأسرة غير مستحقة لهذا الطلب
-                    break;
-                }
-                neededDevices.push('غسالة');
-                break;
-
-            case 'ثلاجة':
-                if (fridgesCount > damagedFridgesCount) {
-                    // الأسرة غير مستحقة لهذا الطلب
-                    break;
-                }
-                neededDevices.push('ثلاجة');
-                break;
-
-            default:
-                neededDevices.push(request);
-                break;
-        }
-    });
-
-
-
-
-    
-   
-    
-    
-   
-
-    
-    
-    
-    
-    
     const stoveDamageType =
         damagedStovesCount > 0
             ? document.getElementById('stoveDamageType').value === 'غير ذلك'
@@ -1103,8 +1017,8 @@ function evaluateFamily() {
                 : document.getElementById('stoveDamageType').value
             : '';
     const hasOven = document.getElementById('hasOven').checked;
-    
-    
+    const washersCount = parseInt(document.getElementById('washersCount').value);
+    const damagedWashersCount = parseInt(document.getElementById('damagedWashersCount').value);
     const washerDamageType =
         damagedWashersCount > 0
             ? document.getElementById('washerDamageType').value === 'غير ذلك'
