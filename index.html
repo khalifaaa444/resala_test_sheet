@@ -1014,6 +1014,7 @@
                         ? document.getElementById('washerOther').querySelector('input').value
                         : document.getElementById('washerDamageType').value
                     : '';
+            const hasWorkingStove = (stovesCount - damagedStovesCount) > 0;
 
             // Collect requests with custom flag
             const requests = Array.from(document.querySelectorAll('input[name="requests"]:checked'))
@@ -1064,10 +1065,21 @@
                         case 'بوتجاز':
                             if (familyType === 'family') {
                                 if (familySize >= 3) {
-                                    if (!addedDevices.has(request)) {
-                                        neededDevices.push(request);
-                                        addedDevices.add(request);
-                                    }
+                                    if (!hasWorkingStove && !hasOven) {
+                                if (!addedDevices.has(request)) {
+                                    neededDevices.push(request);
+                                    addedDevices.add(request);
+                                    additionalNotes += "تم إضافة بوتجاز لأن الأسرة لا تملك بوتجاز ولا فرن. ";
+                                }
+                            } else {
+                                // رسالة توضح سبب عدم إضافة البوتجاز
+                                if (hasWorkingStove) {
+                                    additionalNotes += "لم يتم إضافة بوتجاز لأن الأسرة تملك بوتجازاً يعمل. ";
+                                }
+                                if (hasOven) {
+                                    additionalNotes += "لم يتم إضافة بوتجاز لأن الأسرة تملك فرناً. ";
+                                }
+                            }
                                 } else {
                                     additionalNotes += "عذراً، طلب البوتجاز غير مؤهل لأن عدد أفراد الأسرة أقل من 3. ";
                                 }
