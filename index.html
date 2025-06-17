@@ -1391,21 +1391,6 @@
             const workingMattresses = mattressesCount - damagedMattressesCount;
             const neededMattresses = Math.max(0, requiredMattresses - workingMattresses);
             
-           /* bedConditionDiv.innerHTML = `
-                <div class="calculation-title">
-                    <i class="fas fa-calculator"></i>
-                    <span>حساب عدد السراير والمراتب المطلوبة</span>
-                </div>
-                <div class="calculation-desc">
-                    <p><strong>عدد أفراد الأسرة:</strong> ${familySize}</p>
-                    <p><strong>عدد السراير المطلوبة:</strong> ${familySize} / 1.5 = ${requiredBeds}</p>
-                    <p><strong>السرير المتوفرة (السليمة):</strong> ${bedsCount} - ${damagedBedsCount} = ${workingBeds}</p>
-                    <p><strong>عدد السراير المطلوب إضافتها:</strong> ${neededBeds}</p>
-                    <p><strong>عدد المراتب المطلوبة:</strong> ${familySize} / 1.5 = ${requiredMattresses}</p>
-                    <p><strong>المراتب المتوفرة (السليمة):</strong> ${mattressesCount} - ${damagedMattressesCount} = ${workingMattresses}</p>
-                    <p><strong>عدد المراتب المطلوب إضافتها:</strong> ${neededMattresses}</p>
-                </div>
-            `;*/
 
             // تحديث حالة شرط الغسالة
             if (document.getElementById('requestWasher').checked) {
