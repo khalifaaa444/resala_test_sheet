@@ -545,27 +545,6 @@
         .condition-desc {
             font-size: 0.95rem;
         }
-        
-        .calculation-info {
-            background-color: #e7f3ff;
-            border-radius: var(--border-radius);
-            padding: 15px;
-            margin-top: 15px;
-            border-left: 4px solid var(--primary);
-        }
-        
-        .calculation-title {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-weight: bold;
-            margin-bottom: 10px;
-            color: var(--primary);
-        }
-        
-        .calculation-desc {
-            font-size: 0.95rem;
-        }
 
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(10px); }
@@ -653,21 +632,19 @@
                         <label for="familySize" class="required">عدد أفراد الأسرة:</label>
                         <input type="number" id="familySize" min="1" required placeholder="أدخل عدد الأفراد">
                     </div>
-                    
                     <div id="elderlyGroup" class="form-group" style="display:none;">
-                        <label>هل يوجد مسن في الأسرة؟</label>
-                        <div class="radio-group">
-                            <div class="radio-item">
-                                <input type="radio" name="hasElderly" value="yes" id="elderlyYes">
-                                <label for="elderlyYes">نعم</label>
-                            </div>
-                            <div class="radio-item">
-                                <input type="radio" name="hasElderly" value="no" id="elderlyNo" checked>
-                                <label for="elderlyNo">لا</label>
-                            </div>
-                        </div>
-                    </div>
-                    
+    <label>هل يوجد مسن في الأسرة؟</label>
+    <div class="radio-group">
+        <div class="radio-item">
+            <input type="radio" name="hasElderly" value="yes" id="elderlyYes">
+            <label for="elderlyYes">نعم</label>
+        </div>
+        <div class="radio-item">
+            <input type="radio" name="hasElderly" value="no" id="elderlyNo" checked>
+            <label for="elderlyNo">لا</label>
+        </div>
+    </div>
+</div>
                     <div class="form-group">
                         <label for="income" class="required">الدخل الشهري (جنيه):</label>
                         <input type="number" id="income" min="0" required placeholder="أدخل إجمالي الدخل الشهري">
@@ -989,22 +966,20 @@
                 </div>
                 
                 <div id="washerCondition" class="washer-condition">
-                    <div class="condition-title">
-                        <i class="fas fa-washing-machine"></i>
-                        <span>شروط الحصول على غسالة</span>
-                    </div>
-                    <div id="washerConditionText" class="condition-desc"></div>
-                </div>
+    <div class="condition-title">
+        <i class="fas fa-washing-machine"></i>
+        <span>شروط الحصول على غسالة</span>
+    </div>
+    <div class="condition-desc">
+        <p id="washerConditionText"></p>
+    </div>
+</div>
+
                 
-                <div id="bedCondition" class="calculation-info">
-                    <div class="calculation-title">
-                        <i class="fas fa-calculator"></i>
-                        <span>حساب عدد السراير والمراتب المطلوبة</span>
-                    </div>
-                    <div id="bedConditionText" class="calculation-desc"></div>
-                </div>
                 
-                <div id="devicesNeeded" class="devices-list"></div>
+                <div id="devicesNeeded" class="devices-list">
+                    <h3><i class="fas fa-box-open"></i> الأجهزة المعتمدة:</h3>
+                </div>
             </div>
         </div>
     </div>
@@ -1017,7 +992,6 @@
             const purchasedItemsGroup = document.getElementById('purchasedItemsGroup');
             const medicalConditionsGroup = document.getElementById('medicalConditionsGroup');
             const smallApartmentGroup = document.getElementById('smallApartmentGroup');
-            const elderlyGroup = document.getElementById('elderlyGroup');
             
             // إظهار حقل العائل وما تم شراؤه للعروسة فقط
             if (familyType === 'engaged' || familyType === 'married') {
@@ -1031,12 +1005,17 @@
             if (familyType === 'family') {
                 medicalConditionsGroup.style.display = 'block';
                 smallApartmentGroup.style.display = 'block';
-                elderlyGroup.style.display = 'block';
             } else {
                 medicalConditionsGroup.style.display = 'none';
                 smallApartmentGroup.style.display = 'none';
-                elderlyGroup.style.display = 'none';
             }
+            const elderlyGroup = document.getElementById('elderlyGroup');
+    
+    if (familyType === 'family') {
+        elderlyGroup.style.display = 'block';
+    } else {
+        elderlyGroup.style.display = 'none';
+    }
         });
         
         // إظهار/إخفاء نوع تلف البوتجاز ومحاولة الإصلاح عند إدخال عدد التالف
@@ -1198,7 +1177,7 @@
             const addedDevices = new Set();
             let additionalNotes = '';
             
-            // التحقق من وجود غسالة عاملة
+            // التحقق من وجود غسالة عاملة (الشرط الجديد)
             const workingFullWashers = washersCount - damagedWashersCount;
             const workingHalfWashers = halfWashersCount - damagedHalfWashersCount;
             const hasWorkingWasher = workingFullWashers > 0 || workingHalfWashers > 0;
@@ -1230,25 +1209,19 @@
                 } else {
                     switch (request) {
                         case 'سرير':
-                            // حساب عدد السراير المطلوبة بناءً على عدد الأفراد مقسومًا على 1.5
-                            const requiredBeds = Math.ceil(familySize / 1.5);
+                            const requiredBeds = Math.ceil(familySize / 2);
                             const workingBeds = bedsCount - damagedBedsCount;
-                            const neededBeds = Math.max(0, requiredBeds - workingBeds);
-                            
-                            if (neededBeds > 0 && !addedDevices.has('سرير')) {
-                                neededDevices.push(`سرير (${neededBeds} عدد)`);
+                            if (workingBeds < requiredBeds && !addedDevices.has('سرير')) {
+                                neededDevices.push(`سرير (${requiredBeds - workingBeds} عدد)`);
                                 addedDevices.add('سرير');
                             }
                             break;
 
                         case 'مرتبة':
-                            // حساب عدد المراتب المطلوبة بناءً على عدد الأفراد مقسومًا على 1.5
-                            const requiredMattresses = Math.ceil(familySize / 1.5);
+                            const requiredMattresses = Math.ceil(familySize / 2);
                             const workingMattresses = mattressesCount - damagedMattressesCount;
-                            const neededMattresses = Math.max(0, requiredMattresses - workingMattresses);
-                            
-                            if (neededMattresses > 0 && !addedDevices.has('مرتبة')) {
-                                neededDevices.push(`مرتبة (${neededMattresses} عدد)`);
+                            if (workingMattresses < requiredMattresses && !addedDevices.has('مرتبة')) {
+                                neededDevices.push(`مرتبة (${requiredMattresses - workingMattresses} عدد)`);
                                 addedDevices.add('مرتبة');
                             }
                             break;
@@ -1286,7 +1259,7 @@
                             break;
 
                         case 'غسالة':
-                            // الشرط: إذا كانت الأسرة لديها غسالة عاملة (عادية أو هاف)
+                            // الشرط الجديد: إذا كانت الأسرة لديها غسالة عاملة (عادية أو هاف)
                             if (hasWorkingWasher) {
                                 additionalNotes += "لم يتم إضافة غسالة لأن الأسرة تمتلك غسالة عادية أو هاف تعمل. ";
                                 washerConditionMet = false;
@@ -1310,6 +1283,19 @@
                                 break;
                             }
                             
+                            // إذا كان عدد الأفراد 1
+                            if (familySize === 1) {
+                            // إذا لم يكن هناك مسن فلا يستحق
+                            if (!hasElderly) {
+                                additionalNotes += "لم يتم إضافة غسالة لأن عدد الأفراد 1 ولا يوجد مسن في الأسرة. ";
+                                washerConditionMet = false;
+                                washerConditionNote = "عدد الأفراد 1 ولا يوجد مسن";
+                                break;
+                                }
+                            }
+    
+                            // ... بقية الشروط (التحقق من وجود غسالة عاملة وإصلاح التالف) ...
+    
                             // تحديد نوع الغسالة
                             let washerType = '';
                             if (familySize === 2) {
@@ -1326,6 +1312,39 @@
                                 addedDevices.add(washerType);
                             }
                             break;
+
+                        /*case 'غسالة':
+                            
+                            // الشرط الجديد: إذا كانت الأسرة لديها غسالة عاملة (عادية أو هاف)
+                            if (hasWorkingWasher) {
+                                additionalNotes += "لم يتم إضافة غسالة لأن الأسرة تمتلك غسالة عادية أو هاف تعمل. ";
+                                washerConditionMet = false;
+                                washerConditionNote = "تمتلك الأسرة غسالة عاملة";
+                                break;
+                            }
+                            
+                            // التحقق من محاولة الإصلاح للغسالة التالفة
+                            if (damagedWashersCount > 0 && washerRepairAttempt === 'no') {
+                                additionalNotes += "لم يتم إضافة غسالة بسبب وجود جهاز تالف لم تتم محاولة إصلاحه. ";
+                                washerConditionMet = false;
+                                washerConditionNote = "وجود غسالة تالفة لم تتم محاولة إصلاحها";
+                                break;
+                            }
+                            
+                            // التحقق من محاولة الإصلاح للغسالة الهاف التالفة
+                            if (damagedHalfWashersCount > 0 && halfWasherRepairAttempt === 'no') {
+                                additionalNotes += "لم يتم إضافة غسالة بسبب وجود غسالة هاف تالفة لم تتم محاولة إصلاحها. ";
+                                washerConditionMet = false;
+                                washerConditionNote = "وجود غسالة هاف تالفة لم تتم محاولة إصلاحها";
+                                break;
+                            }
+                            
+                            // إضافة الغسالة إذا لم تكن مضافة
+                            if (!addedDevices.has(request)) {
+                                neededDevices.push(request);
+                                addedDevices.add(request);
+                            }
+                            break;*/
 
                         case 'ثلاجة':
                             // التحقق من محاولة الإصلاح للثلاجة التالفة
@@ -1379,7 +1398,6 @@
             const ratingCircle = document.getElementById('ratingCircle');
             const progressBar = document.getElementById('progressBar');
             const washerConditionDiv = document.getElementById('washerCondition');
-            const bedConditionDiv = document.getElementById('bedCondition');
 
             ratingBadge.className = `rating-badge ${rating}`;
             ratingBadge.textContent = rating;
@@ -1387,31 +1405,6 @@
             ratingCircle.querySelector('.letter').textContent = rating;
             ratingCircle.querySelector('.text').textContent = ratingText;
             progressBar.style.width = `${progressWidth}%`;
-
-            // حساب عدد السراير والمراتب المطلوبة لعرضها في قسم الحساب
-            const requiredBeds = Math.ceil(familySize / 1.5);
-            const workingBeds = bedsCount - damagedBedsCount;
-            const neededBeds = Math.max(0, requiredBeds - workingBeds);
-            
-            const requiredMattresses = Math.ceil(familySize / 1.5);
-            const workingMattresses = mattressesCount - damagedMattressesCount;
-            const neededMattresses = Math.max(0, requiredMattresses - workingMattresses);
-            
-            bedConditionDiv.innerHTML = `
-                <div class="calculation-title">
-                    <i class="fas fa-calculator"></i>
-                    <span>حساب عدد السراير والمراتب المطلوبة</span>
-                </div>
-                <div class="calculation-desc">
-                    <p><strong>عدد أفراد الأسرة:</strong> ${familySize}</p>
-                    <p><strong>عدد السراير المطلوبة:</strong> ${familySize} / 1.5 = ${requiredBeds}</p>
-                    <p><strong>السرير المتوفرة (السليمة):</strong> ${bedsCount} - ${damagedBedsCount} = ${workingBeds}</p>
-                    <p><strong>عدد السراير المطلوب إضافتها:</strong> ${neededBeds}</p>
-                    <p><strong>عدد المراتب المطلوبة:</strong> ${familySize} / 1.5 = ${requiredMattresses}</p>
-                    <p><strong>المراتب المتوفرة (السليمة):</strong> ${mattressesCount} - ${damagedMattressesCount} = ${workingMattresses}</p>
-                    <p><strong>عدد المراتب المطلوب إضافتها:</strong> ${neededMattresses}</p>
-                </div>
-            `;
 
             // تحديث حالة شرط الغسالة
             if (document.getElementById('requestWasher').checked) {
@@ -1444,6 +1437,24 @@
             } else {
                 washerConditionDiv.style.display = 'none';
             }
+            //ظظظظظظظظظظظظظظظظ
+            // تحديث حالة شرط الغسالة
+            /*if (document.getElementById('requestWasher').checked) {
+                washerConditionDiv.style.display = 'block';
+                if (!washerConditionMet) {
+                    washerConditionDiv.className = 'washer-condition not-met';
+                    washerConditionDiv.querySelector('.condition-desc').innerHTML = 
+                        `<p>الأسرة غير مؤهلة للحصول على غسالة</p>
+                         <p><strong>السبب:</strong> ${washerConditionNote}</p>`;
+                } else {
+                    washerConditionDiv.className = 'washer-condition';
+                    washerConditionDiv.querySelector('.condition-desc').innerHTML = 
+                        `<p>الأسرة مؤهلة للحصول على غسالة</p>
+                         <p><strong>السبب:</strong> لا تمتلك الأسرة غسالة عاملة</p>`;
+                }
+            } else {
+                washerConditionDiv.style.display = 'none';
+            }*/
 
             let purchasedItemsHTML = '';
             if (purchasedItems) {
