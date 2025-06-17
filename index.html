@@ -996,13 +996,7 @@
                     <div id="washerConditionText" class="condition-desc"></div>
                 </div>
                 
-                <div id="bedCondition" class="calculation-info">
-                    <div class="calculation-title">
-                        <i class="fas fa-calculator"></i>
-                        <span>حساب عدد السراير والمراتب المطلوبة</span>
-                    </div>
-                    <div id="bedConditionText" class="calculation-desc"></div>
-                </div>
+               
                 
                 <div id="devicesNeeded" class="devices-list"></div>
             </div>
@@ -1397,7 +1391,7 @@
             const workingMattresses = mattressesCount - damagedMattressesCount;
             const neededMattresses = Math.max(0, requiredMattresses - workingMattresses);
             
-            bedConditionDiv.innerHTML = `
+           /* bedConditionDiv.innerHTML = `
                 <div class="calculation-title">
                     <i class="fas fa-calculator"></i>
                     <span>حساب عدد السراير والمراتب المطلوبة</span>
@@ -1411,7 +1405,7 @@
                     <p><strong>المراتب المتوفرة (السليمة):</strong> ${mattressesCount} - ${damagedMattressesCount} = ${workingMattresses}</p>
                     <p><strong>عدد المراتب المطلوب إضافتها:</strong> ${neededMattresses}</p>
                 </div>
-            `;
+            `;*/
 
             // تحديث حالة شرط الغسالة
             if (document.getElementById('requestWasher').checked) {
