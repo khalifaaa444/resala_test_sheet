@@ -520,6 +520,31 @@
             margin-top: 5px;
             z-index: 1;
         }
+        
+        .washer-condition {
+            background-color: #e9f7ef;
+            border-radius: var(--border-radius);
+            padding: 15px;
+            margin-top: 15px;
+            border-left: 4px solid #28a745;
+        }
+        
+        .washer-condition.not-met {
+            background-color: #fbeaea;
+            border-left: 4px solid #dc3545;
+        }
+        
+        .condition-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .condition-desc {
+            font-size: 0.95rem;
+        }
 
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(10px); }
@@ -928,6 +953,16 @@
                     <span>أكثر احتياج</span>
                 </div>
                 
+                <div id="washerCondition" class="washer-condition">
+                    <div class="condition-title">
+                        <i class="fas fa-washing-machine"></i>
+                        <span>شروط الحصول على غسالة</span>
+                    </div>
+                    <div class="condition-desc">
+                        <p>تستحق الأسرة غسالة فقط إذا لم تكن تمتلك غسالة عادية أو هاف تعمل</p>
+                    </div>
+                </div>
+                
                 <div id="devicesNeeded" class="devices-list">
                     <h3><i class="fas fa-box-open"></i> الأجهزة المعتمدة:</h3>
                 </div>
@@ -1119,6 +1154,13 @@
             const neededDevices = [];
             const addedDevices = new Set();
             let additionalNotes = '';
+            
+            // التحقق من وجود غسالة عاملة (الشرط الجديد)
+            const workingFullWashers = washersCount - damagedWashersCount;
+            const workingHalfWashers = halfWashersCount - damagedHalfWashersCount;
+            const hasWorkingWasher = workingFullWashers > 0 || workingHalfWashers > 0;
+            let washerConditionMet = true;
+            let washerConditionNote = '';
 
             // التحقق من وجود عائل للعروسة
             const hasProvider = document.querySelector('input[name="hasProvider"]:checked')?.value === 'yes';
@@ -1127,7 +1169,7 @@
             // إضافة دعم مالي للعروسة إذا لم يكن لها عائل
             if ((familyType === 'engaged' || familyType === 'married') && !hasProvider) {
                 if (!addedDevices.has('الدعم المالي')) {
-                    
+                    neededDevices.push('الدعم المالي');
                     addedDevices.add('الدعم المالي');
                 }
             }
@@ -1195,9 +1237,27 @@
                             break;
 
                         case 'غسالة':
+                            // الشرط الجديد: إذا كانت الأسرة لديها غسالة عاملة (عادية أو هاف)
+                            if (hasWorkingWasher) {
+                                additionalNotes += "لم يتم إضافة غسالة لأن الأسرة تمتلك غسالة عادية أو هاف تعمل. ";
+                                washerConditionMet = false;
+                                washerConditionNote = "تمتلك الأسرة غسالة عاملة";
+                                break;
+                            }
+                            
                             // التحقق من محاولة الإصلاح للغسالة التالفة
                             if (damagedWashersCount > 0 && washerRepairAttempt === 'no') {
                                 additionalNotes += "لم يتم إضافة غسالة بسبب وجود جهاز تالف لم تتم محاولة إصلاحه. ";
+                                washerConditionMet = false;
+                                washerConditionNote = "وجود غسالة تالفة لم تتم محاولة إصلاحها";
+                                break;
+                            }
+                            
+                            // التحقق من محاولة الإصلاح للغسالة الهاف التالفة
+                            if (damagedHalfWashersCount > 0 && halfWasherRepairAttempt === 'no') {
+                                additionalNotes += "لم يتم إضافة غسالة بسبب وجود غسالة هاف تالفة لم تتم محاولة إصلاحها. ";
+                                washerConditionMet = false;
+                                washerConditionNote = "وجود غسالة هاف تالفة لم تتم محاولة إصلاحها";
                                 break;
                             }
                             
@@ -1259,6 +1319,7 @@
             const ratingBadge = document.getElementById('ratingBadge');
             const ratingCircle = document.getElementById('ratingCircle');
             const progressBar = document.getElementById('progressBar');
+            const washerConditionDiv = document.getElementById('washerCondition');
 
             ratingBadge.className = `rating-badge ${rating}`;
             ratingBadge.textContent = rating;
@@ -1266,6 +1327,24 @@
             ratingCircle.querySelector('.letter').textContent = rating;
             ratingCircle.querySelector('.text').textContent = ratingText;
             progressBar.style.width = `${progressWidth}%`;
+            
+            // تحديث حالة شرط الغسالة
+            if (document.getElementById('requestWasher').checked) {
+                washerConditionDiv.style.display = 'block';
+                if (!washerConditionMet) {
+                    washerConditionDiv.className = 'washer-condition not-met';
+                    washerConditionDiv.querySelector('.condition-desc').innerHTML = 
+                        `<p>الأسرة غير مؤهلة للحصول على غسالة</p>
+                         <p><strong>السبب:</strong> ${washerConditionNote}</p>`;
+                } else {
+                    washerConditionDiv.className = 'washer-condition';
+                    washerConditionDiv.querySelector('.condition-desc').innerHTML = 
+                        `<p>الأسرة مؤهلة للحصول على غسالة</p>
+                         <p><strong>السبب:</strong> لا تمتلك الأسرة غسالة عاملة</p>`;
+                }
+            } else {
+                washerConditionDiv.style.display = 'none';
+            }
 
             let purchasedItemsHTML = '';
             if (purchasedItems) {
