@@ -632,7 +632,19 @@
                         <label for="familySize" class="required">عدد أفراد الأسرة:</label>
                         <input type="number" id="familySize" min="1" required placeholder="أدخل عدد الأفراد">
                     </div>
-                    
+                    <div id="elderlyGroup" class="form-group" style="display:none;">
+    <label>هل يوجد مسن في الأسرة؟</label>
+    <div class="radio-group">
+        <div class="radio-item">
+            <input type="radio" name="hasElderly" value="yes" id="elderlyYes">
+            <label for="elderlyYes">نعم</label>
+        </div>
+        <div class="radio-item">
+            <input type="radio" name="hasElderly" value="no" id="elderlyNo" checked>
+            <label for="elderlyNo">لا</label>
+        </div>
+    </div>
+</div>
                     <div class="form-group">
                         <label for="income" class="required">الدخل الشهري (جنيه):</label>
                         <input type="number" id="income" min="0" required placeholder="أدخل إجمالي الدخل الشهري">
@@ -962,6 +974,8 @@
                         <p>تستحق الأسرة غسالة فقط إذا لم تكن تمتلك غسالة عادية أو هاف تعمل</p>
                     </div>
                 </div>
+
+                
                 
                 <div id="devicesNeeded" class="devices-list">
                     <h3><i class="fas fa-box-open"></i> الأجهزة المعتمدة:</h3>
@@ -995,6 +1009,13 @@
                 medicalConditionsGroup.style.display = 'none';
                 smallApartmentGroup.style.display = 'none';
             }
+            const elderlyGroup = document.getElementById('elderlyGroup');
+    
+    if (familyType === 'family') {
+        elderlyGroup.style.display = 'block';
+    } else {
+        elderlyGroup.style.display = 'none';
+    }
         });
         
         // إظهار/إخفاء نوع تلف البوتجاز ومحاولة الإصلاح عند إدخال عدد التالف
@@ -1092,6 +1113,7 @@
             const familySize = parseInt(document.getElementById('familySize').value);
             const income = parseFloat(document.getElementById('income').value);
             const expenses = parseFloat(document.getElementById('expenses').value);
+            const hasElderly = document.querySelector('input[name="hasElderly"]:checked')?.value === 'yes';
 
             // جمع بيانات الأجهزة
             const bedsCount = parseInt(document.getElementById('bedsCount').value);
@@ -1261,12 +1283,68 @@
                                 break;
                             }
                             
+                            // إذا كان عدد الأفراد 1
+                            if (familySize === 1) {
+                            // إذا لم يكن هناك مسن فلا يستحق
+                            if (!hasElderly) {
+                                additionalNotes += "لم يتم إضافة غسالة لأن عدد الأفراد 1 ولا يوجد مسن في الأسرة. ";
+                                washerConditionMet = false;
+                                washerConditionNote = "عدد الأفراد 1 ولا يوجد مسن";
+                                break;
+                                }
+                            }
+    
+                            // ... بقية الشروط (التحقق من وجود غسالة عاملة وإصلاح التالف) ...
+    
+                            // تحديد نوع الغسالة
+                            let washerType = '';
+                            if (familySize === 2) {
+                                washerType = 'غسالة عادية';
+                            } else if (familySize >= 3) {
+                                washerType = 'غسالة هاف';
+                            } else if (familySize === 1 && hasElderly) {
+                                washerType = 'غسالة عادية (لشخص مسن)';
+                            }
+    
+                            // إضافة الغسالة المحددة
+                            if (washerType && !addedDevices.has(washerType)) {
+                                neededDevices.push(washerType);
+                                addedDevices.add(washerType);
+                            }
+                            break;
+
+                        /*case 'غسالة':
+                            
+                            // الشرط الجديد: إذا كانت الأسرة لديها غسالة عاملة (عادية أو هاف)
+                            if (hasWorkingWasher) {
+                                additionalNotes += "لم يتم إضافة غسالة لأن الأسرة تمتلك غسالة عادية أو هاف تعمل. ";
+                                washerConditionMet = false;
+                                washerConditionNote = "تمتلك الأسرة غسالة عاملة";
+                                break;
+                            }
+                            
+                            // التحقق من محاولة الإصلاح للغسالة التالفة
+                            if (damagedWashersCount > 0 && washerRepairAttempt === 'no') {
+                                additionalNotes += "لم يتم إضافة غسالة بسبب وجود جهاز تالف لم تتم محاولة إصلاحه. ";
+                                washerConditionMet = false;
+                                washerConditionNote = "وجود غسالة تالفة لم تتم محاولة إصلاحها";
+                                break;
+                            }
+                            
+                            // التحقق من محاولة الإصلاح للغسالة الهاف التالفة
+                            if (damagedHalfWashersCount > 0 && halfWasherRepairAttempt === 'no') {
+                                additionalNotes += "لم يتم إضافة غسالة بسبب وجود غسالة هاف تالفة لم تتم محاولة إصلاحها. ";
+                                washerConditionMet = false;
+                                washerConditionNote = "وجود غسالة هاف تالفة لم تتم محاولة إصلاحها";
+                                break;
+                            }
+                            
                             // إضافة الغسالة إذا لم تكن مضافة
                             if (!addedDevices.has(request)) {
                                 neededDevices.push(request);
                                 addedDevices.add(request);
                             }
-                            break;
+                            break;*/
 
                         case 'ثلاجة':
                             // التحقق من محاولة الإصلاح للثلاجة التالفة
@@ -1327,9 +1405,41 @@
             ratingCircle.querySelector('.letter').textContent = rating;
             ratingCircle.querySelector('.text').textContent = ratingText;
             progressBar.style.width = `${progressWidth}%`;
-            
+
             // تحديث حالة شرط الغسالة
             if (document.getElementById('requestWasher').checked) {
+                washerConditionDiv.style.display = 'block';
+    
+                if (familySize === 1) {
+                    washerConditionText.innerHTML = `
+                        <p>لا تستحق الأسرة غسالة إلا إذا كان الفرد مسنًا</p>
+                        <p><strong>عدد الأفراد:</strong> ${familySize}</p>
+                        <p><strong>هل يوجد مسن؟</strong> ${hasElderly ? 'نعم' : 'لا'}</p>
+                    `;
+                } else if (familySize === 2) {
+                    washerConditionText.innerHTML = `
+                        <p>تستحق الأسرة غسالة عادية لأن عدد الأسرة 2</p>
+                        <p><strong>عدد الأسرة:</strong> ${familySize}</p>
+                    `;
+                } else if (familySize >= 3) {
+                    washerConditionText.innerHTML = `
+                        <p>تستحق الأسرة غسالة هاف لأن عدد الأسرة 3 أو أكثر</p>
+                        <p><strong>عدد الأسرة:</strong> ${familySize}</p>
+                    `;
+                }
+    
+                if (!washerConditionMet) {
+                    washerConditionDiv.className = 'washer-condition not-met';
+                    washerConditionText.innerHTML += `<p><strong>سبب عدم الاستحقاق:</strong> ${washerConditionNote}</p>`;
+                } else {
+                    washerConditionDiv.className = 'washer-condition';
+                }
+            } else {
+                washerConditionDiv.style.display = 'none';
+            }
+            //ظظظظظظظظظظظظظظظظ
+            // تحديث حالة شرط الغسالة
+            /*if (document.getElementById('requestWasher').checked) {
                 washerConditionDiv.style.display = 'block';
                 if (!washerConditionMet) {
                     washerConditionDiv.className = 'washer-condition not-met';
@@ -1344,7 +1454,7 @@
                 }
             } else {
                 washerConditionDiv.style.display = 'none';
-            }
+            }*/
 
             let purchasedItemsHTML = '';
             if (purchasedItems) {
