@@ -60,24 +60,6 @@
             z-index: 2;
         }
 
-        header {
-            padding: 30px;
-            text-align: center;
-            background: linear-gradient(135deg, rgba(67, 97, 238, 0.1) 0%, rgba(72, 149, 239, 0.1) 100%);
-            position: relative;
-            overflow: hidden;
-        }
-
-        header::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 1px;
-            background: linear-gradient(90deg, transparent 0%, rgba(0, 0, 0, 0.1) 50%, transparent 100%);
-        }
-
         textarea {
             min-height: 100px;
             resize: vertical;
@@ -693,6 +675,20 @@
                             </div>
                         </div>
                         
+                        <div id="stoveRepairAttemptGroup" class="damage-type-group" style="display: none;">
+                            <label>هل تم محاولة إصلاحه من قبل؟</label>
+                            <div class="radio-group">
+                                <div class="radio-item">
+                                    <input type="radio" name="stoveRepairAttempt" value="yes" id="stoveRepairYes">
+                                    <label for="stoveRepairYes">نعم</label>
+                                </div>
+                                <div class="radio-item">
+                                    <input type="radio" name="stoveRepairAttempt" value="no" id="stoveRepairNo" checked>
+                                    <label for="stoveRepairNo">لا</label>
+                                </div>
+                            </div>
+                        </div>
+                        
                         <div style="margin-top: 15px;">
                             <div class="request-item">
                                 <input type="checkbox" id="hasOven">
@@ -728,6 +724,20 @@
                                 <input type="text" placeholder="حدد نوع التلف">
                             </div>
                         </div>
+                        
+                        <div id="washerRepairAttemptGroup" class="damage-type-group" style="display: none;">
+                            <label>هل تم محاولة إصلاحه من قبل؟</label>
+                            <div class="radio-group">
+                                <div class="radio-item">
+                                    <input type="radio" name="washerRepairAttempt" value="yes" id="washerRepairYes">
+                                    <label for="washerRepairYes">نعم</label>
+                                </div>
+                                <div class="radio-item">
+                                    <input type="radio" name="washerRepairAttempt" value="no" id="washerRepairNo" checked>
+                                    <label for="washerRepairNo">لا</label>
+                                </div>
+                            </div>
+                        </div>
 
                         <div class="device-count">
                             <div>
@@ -751,6 +761,20 @@
                             </select>
                             <div id="halfWasherOther" class="other-input" style="display: none;">
                                 <input type="text" placeholder="حدد نوع التلف">
+                            </div>
+                        </div>
+                        
+                        <div id="halfWasherRepairAttemptGroup" class="damage-type-group" style="display: none;">
+                            <label>هل تم محاولة إصلاحه من قبل؟</label>
+                            <div class="radio-group">
+                                <div class="radio-item">
+                                    <input type="radio" name="halfWasherRepairAttempt" value="yes" id="halfWasherRepairYes">
+                                    <label for="halfWasherRepairYes">نعم</label>
+                                </div>
+                                <div class="radio-item">
+                                    <input type="radio" name="halfWasherRepairAttempt" value="no" id="halfWasherRepairNo" checked>
+                                    <label for="halfWasherRepairNo">لا</label>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -779,6 +803,20 @@
                             </select>
                             <div id="fridgeOther" class="other-input" style="display: none;">
                                 <input type="text" placeholder="حدد نوع التلف">
+                            </div>
+                        </div>
+                        
+                        <div id="fridgeRepairAttemptGroup" class="damage-type-group" style="display: none;">
+                            <label>هل تم محاولة إصلاحه من قبل؟</label>
+                            <div class="radio-group">
+                                <div class="radio-item">
+                                    <input type="radio" name="fridgeRepairAttempt" value="yes" id="fridgeRepairYes">
+                                    <label for="fridgeRepairYes">نعم</label>
+                                </div>
+                                <div class="radio-item">
+                                    <input type="radio" name="fridgeRepairAttempt" value="no" id="fridgeRepairNo" checked>
+                                    <label for="fridgeRepairNo">لا</label>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -924,28 +962,56 @@
             }
         });
         
-        // إظهار/إخفاء نوع تلف البوتجاز عند إدخال عدد التالف
+        // إظهار/إخفاء نوع تلف البوتجاز ومحاولة الإصلاح عند إدخال عدد التالف
         document.getElementById('damagedStovesCount').addEventListener('input', function() {
             const damageTypeGroup = document.getElementById('stoveDamageTypeGroup');
-            damageTypeGroup.style.display = this.value > 0 ? 'block' : 'none';
+            const repairGroup = document.getElementById('stoveRepairAttemptGroup');
+            if (this.value > 0) {
+                damageTypeGroup.style.display = 'block';
+                repairGroup.style.display = 'block';
+            } else {
+                damageTypeGroup.style.display = 'none';
+                repairGroup.style.display = 'none';
+            }
         });
         
-        // إظهار/إخفاء نوع تلف الغسالة العادية عند إدخال عدد التالف
+        // إظهار/إخفاء نوع تلف الغسالة العادية ومحاولة الإصلاح
         document.getElementById('damagedWashersCount').addEventListener('input', function() {
             const damageTypeGroup = document.getElementById('washerDamageTypeGroup');
-            damageTypeGroup.style.display = this.value > 0 ? 'block' : 'none';
+            const repairGroup = document.getElementById('washerRepairAttemptGroup');
+            if (this.value > 0) {
+                damageTypeGroup.style.display = 'block';
+                repairGroup.style.display = 'block';
+            } else {
+                damageTypeGroup.style.display = 'none';
+                repairGroup.style.display = 'none';
+            }
         });
         
-        // إظهار/إخفاء نوع تلف الغسالة الهاف عند إدخال عدد التالف
+        // إظهار/إخفاء نوع تلف الغسالة الهاف ومحاولة الإصلاح
         document.getElementById('damagedHalfWashersCount').addEventListener('input', function() {
             const damageTypeGroup = document.getElementById('halfWasherDamageTypeGroup');
-            damageTypeGroup.style.display = this.value > 0 ? 'block' : 'none';
+            const repairGroup = document.getElementById('halfWasherRepairAttemptGroup');
+            if (this.value > 0) {
+                damageTypeGroup.style.display = 'block';
+                repairGroup.style.display = 'block';
+            } else {
+                damageTypeGroup.style.display = 'none';
+                repairGroup.style.display = 'none';
+            }
         });
         
-        // إظهار/إخفاء نوع تلف الثلاجة عند إدخال عدد التالف
+        // إظهار/إخفاء نوع تلف الثلاجة ومحاولة الإصلاح
         document.getElementById('damagedFridgesCount').addEventListener('input', function() {
             const damageTypeGroup = document.getElementById('fridgeDamageTypeGroup');
-            damageTypeGroup.style.display = this.value > 0 ? 'block' : 'none';
+            const repairGroup = document.getElementById('fridgeRepairAttemptGroup');
+            if (this.value > 0) {
+                damageTypeGroup.style.display = 'block';
+                repairGroup.style.display = 'block';
+            } else {
+                damageTypeGroup.style.display = 'none';
+                repairGroup.style.display = 'none';
+            }
         });
         
         // إدارة الحقول الإضافية عند اختيار "غير ذلك" للبوتجاز
@@ -985,14 +1051,14 @@
         
         // دالة تقييم الأسرة
         function evaluateFamily() {
-            // Collect basic data
+            // جمع البيانات الأساسية
             const familyType = document.getElementById('familyType').value;
             const familyName = document.getElementById('familyName').value;
             const familySize = parseInt(document.getElementById('familySize').value);
             const income = parseFloat(document.getElementById('income').value);
             const expenses = parseFloat(document.getElementById('expenses').value);
 
-            // Collect device data
+            // جمع بيانات الأجهزة
             const bedsCount = parseInt(document.getElementById('bedsCount').value);
             const damagedBedsCount = parseInt(document.getElementById('damagedBedsCount').value);
             const mattressesCount = parseInt(document.getElementById('mattressesCount').value);
@@ -1014,9 +1080,30 @@
                         ? document.getElementById('washerOther').querySelector('input').value
                         : document.getElementById('washerDamageType').value
                     : '';
-            const hasWorkingStove = (stovesCount - damagedStovesCount) > 0;
-
-            // Collect requests with custom flag
+            const halfWashersCount = parseInt(document.getElementById('halfWashersCount').value);
+            const damagedHalfWashersCount = parseInt(document.getElementById('damagedHalfWashersCount').value);
+            const halfWasherDamageType =
+                damagedHalfWashersCount > 0
+                    ? document.getElementById('halfWasherDamageType').value === 'غير ذلك'
+                        ? document.getElementById('halfWasherOther').querySelector('input').value
+                        : document.getElementById('halfWasherDamageType').value
+                    : '';
+            const fridgesCount = parseInt(document.getElementById('fridgesCount').value);
+            const damagedFridgesCount = parseInt(document.getElementById('damagedFridgesCount').value);
+            const fridgeDamageType =
+                damagedFridgesCount > 0
+                    ? document.getElementById('fridgeDamageType').value === 'غير ذلك'
+                        ? document.getElementById('fridgeOther').querySelector('input').value
+                        : document.getElementById('fridgeDamageType').value
+                    : '';
+            
+            // جمع إجابات محاولة الإصلاح
+            const stoveRepairAttempt = document.querySelector('input[name="stoveRepairAttempt"]:checked')?.value;
+            const washerRepairAttempt = document.querySelector('input[name="washerRepairAttempt"]:checked')?.value;
+            const halfWasherRepairAttempt = document.querySelector('input[name="halfWasherRepairAttempt"]:checked')?.value;
+            const fridgeRepairAttempt = document.querySelector('input[name="fridgeRepairAttempt"]:checked')?.value;
+            
+            // جمع الطلبات مع العلم أنها قد تكون مخصصة
             const requests = Array.from(document.querySelectorAll('input[name="requests"]:checked'))
                 .map(checkbox => {
                     if (checkbox.value === 'غير ذلك') {
@@ -1026,13 +1113,26 @@
                         return { value: checkbox.value, isCustom: false };
                     }
                 })
-                .filter(request => request.value !== ''); // Ignore empty requests
+                .filter(request => request.value !== ''); // تجاهل الطلبات الفارغة
 
-            // Determine needed devices
+            // تحديد الأجهزة المطلوبة
             const neededDevices = [];
             const addedDevices = new Set();
             let additionalNotes = '';
 
+            // التحقق من وجود عائل للعروسة
+            const hasProvider = document.querySelector('input[name="hasProvider"]:checked')?.value === 'yes';
+            const purchasedItems = document.getElementById('purchasedItems').value;
+
+            // إضافة دعم مالي للعروسة إذا لم يكن لها عائل
+            if ((familyType === 'engaged' || familyType === 'married') && !hasProvider) {
+                if (!addedDevices.has('الدعم المالي')) {
+                    neededDevices.push('الدعم المالي (عدم وجود عائل)');
+                    addedDevices.add('الدعم المالي');
+                }
+            }
+
+            // معالجة الطلبات
             requests.forEach(requestObj => {
                 const request = requestObj.value;
                 const isCustom = requestObj.isCustom;
@@ -1063,31 +1163,62 @@
                             break;
 
                         case 'بوتجاز':
+                            // التحقق من محاولة الإصلاح للبوتجاز التالف
+                            if (damagedStovesCount > 0 && stoveRepairAttempt === 'no') {
+                                additionalNotes += "لم يتم إضافة بوتجاز بسبب وجود جهاز تالف لم تتم محاولة إصلاحه. ";
+                                break;
+                            }
+                            
+                            // التحقق من شروط البوتجاز للأسرة
                             if (familyType === 'family') {
-                                if (familySize >= 3) {
-                                    if (!hasWorkingStove && !hasOven) {
-                                if (!addedDevices.has(request)) {
-                                    neededDevices.push(request);
-                                    addedDevices.add(request);
-                                    additionalNotes += "تم إضافة بوتجاز لأن الأسرة لا تملك بوتجاز ولا فرن مع سحب التالف ان وجد. ";
-                                }
-                            } else {
-                                // رسالة توضح سبب عدم إضافة البوتجاز
-                                if (hasWorkingStove) {
-                                    additionalNotes += "لم يتم إضافة بوتجاز لأن الأسرة تملك بوتجازاً يعمل. ";
-                                }
-                                if (hasOven) {
-                                    additionalNotes += "لم يتم إضافة بوتجاز لأن الأسرة تملك فرناً. ";
+                                if (familySize < 3) {
+                                    additionalNotes += "عذراً، طلب البوتجاز غير مؤهل لأن عدد أفراد الأسرة أقل من 3. ";
+                                    break;
                                 }
                             }
-                                } else {
-                                    additionalNotes += "عذراً، طلب البوتجاز غير مؤهل لأن عدد أفراد الأسرة أقل من 3. ";
-                                }
-                            } else {
-                                if (!addedDevices.has(request)) {
-                                    neededDevices.push(request);
-                                    addedDevices.add(request);
-                                }
+                            
+                            // التحقق من وجود بوتجاز عامل أو فرن
+                            const hasWorkingStove = (stovesCount - damagedStovesCount) > 0;
+                            if (hasWorkingStove) {
+                                additionalNotes += "لم يتم إضافة بوتجاز لأن الأسرة تملك بوتجازاً يعمل. ";
+                                break;
+                            }
+                            if (hasOven) {
+                                additionalNotes += "لم يتم إضافة بوتجاز لأن الأسرة تملك فرناً. ";
+                                break;
+                            }
+
+                            if (!addedDevices.has(request)) {
+                                neededDevices.push(request);
+                                addedDevices.add(request);
+                            }
+                            break;
+
+                        case 'غسالة':
+                            // التحقق من محاولة الإصلاح للغسالة التالفة
+                            if (damagedWashersCount > 0 && washerRepairAttempt === 'no') {
+                                additionalNotes += "لم يتم إضافة غسالة بسبب وجود جهاز تالف لم تتم محاولة إصلاحه. ";
+                                break;
+                            }
+                            
+                            // إضافة الغسالة إذا لم تكن مضافة
+                            if (!addedDevices.has(request)) {
+                                neededDevices.push(request);
+                                addedDevices.add(request);
+                            }
+                            break;
+
+                        case 'ثلاجة':
+                            // التحقق من محاولة الإصلاح للثلاجة التالفة
+                            if (damagedFridgesCount > 0 && fridgeRepairAttempt === 'no') {
+                                additionalNotes += "لم يتم إضافة ثلاجة بسبب وجود جهاز تالف لم تتم محاولة إصلاحه. ";
+                                break;
+                            }
+                            
+                            // إضافة الثلاجة إذا لم تكن مضافة
+                            if (!addedDevices.has(request)) {
+                                neededDevices.push(request);
+                                addedDevices.add(request);
                             }
                             break;
 
@@ -1101,19 +1232,7 @@
                 }
             });
 
-            // Collect new data
-            const hasProvider = document.querySelector('input[name="hasProvider"]:checked')?.value === 'yes';
-            const purchasedItems = document.getElementById('purchasedItems').value;
-
-            // Add check for provider
-            if ((familyType === 'engaged' || familyType === 'married') && !hasProvider) {
-                if (!addedDevices.has('الدعم المالي')) {
-                    neededDevices.push('الدعم المالي (عدم وجود عائل)');
-                    addedDevices.add('الدعم المالي');
-                }
-            }
-
-            // Calculate eligibility rating and display results
+            // حساب تصنيف الاستحقاق وعرض النتائج
             const netIncome = income - expenses;
             let rating = 'C';
             let ratingText = 'منخفض';
@@ -1123,17 +1242,17 @@
                 rating = 'A';
                 ratingText = 'عالي جداً';
                 progressWidth = 90;
-                additionalNotes += 'الأسرة في حاجة ماسة للمساعدة بناءً على الدخل المنخفض';
+                additionalNotes += 'الأسرة في حاجة ماسة للمساعدة بناءً على الدخل المنخفض. ';
             } else if (netIncome <= 1500) {
                 rating = 'B';
                 ratingText = 'متوسط';
                 progressWidth = 60;
-                additionalNotes += 'الأسرة في حاجة للمساعدة ولكن ليست في حالة طارئة';
+                additionalNotes += 'الأسرة في حاجة للمساعدة ولكن ليست في حالة طارئة. ';
             } else {
-                additionalNotes += 'الأسرة لديها دخل كافٍ نسبياً، يمكن النظر في حالات خاصة';
+                additionalNotes += 'الأسرة لديها دخل كافٍ نسبياً، يمكن النظر في حالات خاصة. ';
             }
 
-            // Display results
+            // عرض النتائج
             const resultDiv = document.getElementById('result');
             const eligibilityStatus = document.getElementById('eligibilityStatus');
             const devicesNeededDiv = document.getElementById('devicesNeeded');
