@@ -579,6 +579,30 @@
             background-color: #fbeaea;
             border-left: 4px solid #dc3545;
         }
+        
+        .bride-rules {
+            background-color: #f8f0fc;
+            border-radius: var(--border-radius);
+            padding: 15px;
+            margin-top: 15px;
+            border-left: 4px solid #9c36b5;
+        }
+        
+        .bride-rules h4 {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #9c36b5;
+            margin-bottom: 10px;
+        }
+        
+        .bride-rules ul {
+            padding-right: 20px;
+        }
+        
+        .bride-rules li {
+            margin-bottom: 8px;
+        }
 
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(10px); }
@@ -624,14 +648,14 @@
 <body>
     <div class="container">
         <header>
-            <h1><i class="fas fa-hand-holding-heart"></i> نظام تقييم استحقاق الأسر للمساعدات</h1>
-            <p>نظام قائم لتقييم الحالات الخاصة بنشاط المساعدات</p>
+            <h1><i class="fas fa-hand-holding-heart"></i> نظام تقييم استحقاق الأسر والعروسات للمساعدات</h1>
+            <p>نظام قائم لتقييم الحالات الخاصة بنشاط المساعدات مع قواعد خاصة للعروسات</p>
         </header>
         
         <div class="form-content">
             <form id="familyForm">
                 <div class="form-section">
-                    <h2><i class="fas fa-users"></i> بيانات الأسرة</h2>
+                    <h2><i class="fas fa-users"></i> بيانات الأسرة/العروسة</h2>
                     
                     <div class="form-group">
                         <label for="familyType" class="required">نوع الأسرة:</label>
@@ -1017,7 +1041,10 @@
                     <div id="fridgeConditionText" class="condition-desc"></div>
                 </div>
                 
-                
+                <div id="brideRules" class="bride-rules">
+                    <h4><i class="fas fa-ring"></i> قواعد خاصة للعروسات</h4>
+                    <div id="brideRulesText"></div>
+                </div>
                 
                 <div id="devicesNeeded" class="devices-list"></div>
             </div>
@@ -1150,6 +1177,7 @@
             const income = parseFloat(document.getElementById('income').value);
             const expenses = parseFloat(document.getElementById('expenses').value);
             const hasElderly = document.querySelector('input[name="hasElderly"]:checked')?.value === 'yes';
+            const hasProvider = document.querySelector('input[name="hasProvider"]:checked')?.value === 'yes';
 
             // جمع بيانات الأجهزة
             const bedsCount = parseInt(document.getElementById('bedsCount').value);
@@ -1197,7 +1225,7 @@
             const fridgeRepairAttempt = document.querySelector('input[name="fridgeRepairAttempt"]:checked')?.value;
             
             // جمع الطلبات مع العلم أنها قد تكون مخصصة
-            const requests = Array.from(document.querySelectorAll('input[name="requests"]:checked'))
+            let requests = Array.from(document.querySelectorAll('input[name="requests"]:checked'))
                 .map(checkbox => {
                     if (checkbox.value === 'غير ذلك') {
                         const value = document.getElementById('otherRequest').querySelector('input').value.trim();
@@ -1212,17 +1240,108 @@
             const neededDevices = [];
             const addedDevices = new Set();
             let additionalNotes = '';
+            let brideRules = '';
             
+            // تطبيق القواعد الخاصة للعروسات المكتوب كتابهن
+            if (familyType === 'married') {
+                brideRules = '<p>القواعد المطبقة للعروسة:</p><ul>';
+                
+                // تحديد الطلبات المحددة
+                const hasFridgeRequest = requests.some(req => req.value === 'ثلاجة');
+                const hasWasherRequest = requests.some(req => req.value === 'غسالة');
+                const hasStoveRequest = requests.some(req => req.value === 'بوتجاز');
+                
+                // الحالة 1: طلبت غسالة وثلاجة وبوتجاز
+                if (hasFridgeRequest && hasWasherRequest && hasStoveRequest) {
+                    neededDevices.push('غسالة هاف');
+                    neededDevices.push('بوتجاز');
+                    addedDevices.add('غسالة هاف');
+                    addedDevices.add('بوتجاز');
+                    brideRules += '<li>ناجح في (غسالة هاف وبوتجاز) بسبب طلب غسالة وثلاجة وبوتجاز</li>';
+                    
+                    // إزالة هذه الطلبات من القائمة
+                    requests = requests.filter(req => 
+                        req.value !== 'ثلاجة' && 
+                        req.value !== 'غسالة' && 
+                        req.value !== 'بوتجاز'
+                    );
+                }
+                // الحالة 2: طلبت بوتجاز فقط أو غسالة فقط
+                else if ((hasStoveRequest && !hasWasherRequest && !hasFridgeRequest) || 
+                         (hasWasherRequest && !hasStoveRequest && !hasFridgeRequest)) {
+                    if (hasStoveRequest) {
+                        neededDevices.push('بوتجاز 5 شعلة');
+                        addedDevices.add('بوتجاز 5 شعلة');
+                        brideRules += '<li>ناجح في بوتجاز 5 شعلة بسبب طلب بوتجاز فقط</li>';
+                        requests = requests.filter(req => req.value !== 'بوتجاز');
+                    }
+                    if (hasWasherRequest) {
+                        neededDevices.push('غسالة هاف');
+                        addedDevices.add('غسالة هاف');
+                        brideRules += '<li>ناجح في غسالة هاف بسبب طلب غسالة فقط</li>';
+                        requests = requests.filter(req => req.value !== 'غسالة');
+                    }
+                }
+                // الحالة 3: طلبت بوتجاز وغسالة معاً
+                else if (hasStoveRequest && hasWasherRequest && !hasFridgeRequest) {
+                    neededDevices.push('غسالة هاف');
+                    neededDevices.push('بوتجاز 5 شعلة');
+                    addedDevices.add('غسالة هاف');
+                    addedDevices.add('بوتجاز 5 شعلة');
+                    brideRules += '<li>ناجح في (غسالة هاف وبوتجاز 5 شعلة) بسبب طلب بوتجاز وغسالة معاً</li>';
+                    requests = requests.filter(req => req.value !== 'بوتجاز' && req.value !== 'غسالة');
+                }
+                // الحالة 4: طلبت ثلاجة فقط
+                else if (hasFridgeRequest && !hasWasherRequest && !hasStoveRequest) {
+                    if (!hasProvider) {
+                        neededDevices.push('ثلاجة');
+                        addedDevices.add('ثلاجة');
+                        brideRules += '<li>ناجح في ثلاجة بسبب عدم وجود عائل</li>';
+                    } else {
+                        brideRules += '<li>غير ناجح في ثلاجة بسبب وجود عائل</li>';
+                    }
+                    requests = requests.filter(req => req.value !== 'ثلاجة');
+                }
+                // الحالة 5: طلبت غسالة وثلاجة
+                else if (hasWasherRequest && hasFridgeRequest && !hasStoveRequest) {
+                    if (!hasProvider) {
+                        neededDevices.push('غسالة هاف');
+                        neededDevices.push('ثلاجة');
+                        addedDevices.add('غسالة هاف');
+                        addedDevices.add('ثلاجة');
+                        brideRules += '<li>ناجح في (غسالة هاف وثلاجة) بسبب عدم وجود عائل</li>';
+                    } else {
+                        neededDevices.push('غسالة هاف');
+                        addedDevices.add('غسالة هاف');
+                        brideRules += '<li>ناجح في غسالة هاف فقط بسبب وجود عائل</li>';
+                    }
+                    requests = requests.filter(req => req.value !== 'غسالة' && req.value !== 'ثلاجة');
+                }
+                // الحالة 6: طلبت بوتجاز وثلاجة
+                else if (hasStoveRequest && hasFridgeRequest && !hasWasherRequest) {
+                    if (!hasProvider) {
+                        neededDevices.push('بوتجاز');
+                        neededDevices.push('ثلاجة');
+                        addedDevices.add('بوتجاز');
+                        addedDevices.add('ثلاجة');
+                        brideRules += '<li>ناجح في (بوتجاز وثلاجة) بسبب عدم وجود عائل</li>';
+                    } else {
+                        neededDevices.push('بوتجاز');
+                        addedDevices.add('بوتجاز');
+                        brideRules += '<li>ناجح في بوتجاز فقط بسبب وجود عائل</li>';
+                    }
+                    requests = requests.filter(req => req.value !== 'بوتجاز' && req.value !== 'ثلاجة');
+                }
+                
+                brideRules += '</ul>';
+            }
+
             // التحقق من وجود غسالة عاملة
             const workingFullWashers = washersCount - damagedWashersCount;
             const workingHalfWashers = halfWashersCount - damagedHalfWashersCount;
             const hasWorkingWasher = workingFullWashers > 0 || workingHalfWashers > 0;
             let washerConditionMet = true;
             let washerConditionNote = '';
-
-            // التحقق من وجود عائل للعروسة
-            const hasProvider = document.querySelector('input[name="hasProvider"]:checked')?.value === 'yes';
-            const purchasedItems = document.getElementById('purchasedItems').value;
 
             // إضافة دعم مالي للعروسة إذا لم يكن لها عائل
             if ((familyType === 'engaged' || familyType === 'married') && !hasProvider) {
@@ -1237,7 +1356,7 @@
             let fridgeConditionNote = '';
             let fridgeConditionDetails = '';
             
-            // معالجة الطلبات
+            // معالجة الطلبات المتبقية
             requests.forEach(requestObj => {
                 const request = requestObj.value;
                 const isCustom = requestObj.isCustom;
@@ -1451,7 +1570,8 @@
             const progressBar = document.getElementById('progressBar');
             const washerConditionDiv = document.getElementById('washerCondition');
             const fridgeConditionDiv = document.getElementById('fridgeCondition');
-            const bedConditionDiv = document.getElementById('bedCondition');
+            const brideRulesDiv = document.getElementById('brideRules');
+            const brideRulesText = document.getElementById('brideRulesText');
 
             ratingBadge.className = `rating-badge ${rating}`;
             ratingBadge.textContent = rating;
@@ -1459,17 +1579,6 @@
             ratingCircle.querySelector('.letter').textContent = rating;
             ratingCircle.querySelector('.text').textContent = ratingText;
             progressBar.style.width = `${progressWidth}%`;
-
-            // حساب عدد السراير والمراتب المطلوبة لعرضها في قسم الحساب
-            const requiredBeds = Math.ceil(familySize / 2);
-            const workingBeds = bedsCount - damagedBedsCount;
-            const neededBeds = Math.max(0, requiredBeds - workingBeds);
-            
-            const requiredMattresses = Math.ceil(familySize / 2);
-            const workingMattresses = mattressesCount - damagedMattressesCount;
-            const neededMattresses = Math.max(0, requiredMattresses - workingMattresses);
-            
-            
 
             // تحديث حالة شرط الغسالة
             if (document.getElementById('requestWasher').checked) {
@@ -1515,6 +1624,14 @@
                 }
             } else {
                 fridgeConditionDiv.style.display = 'none';
+            }
+            
+            // تحديث قسم قواعد العروسات
+            if (familyType === 'married') {
+                brideRulesDiv.style.display = 'block';
+                brideRulesText.innerHTML = brideRules;
+            } else {
+                brideRulesDiv.style.display = 'none';
             }
 
             let purchasedItemsHTML = '';
