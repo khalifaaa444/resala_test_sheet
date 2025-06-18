@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>نظام تقييم استحقاق العرائس للمساعدات</title>
+    <title>نظام تقييم استحقاق الأسر للمساعدات</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
@@ -60,12 +60,25 @@
             z-index: 2;
         }
 
-        header {
-            padding: 25px 30px;
-            background-color: white;
-            border-bottom: 1px solid #eee;
+        textarea {
+            min-height: 100px;
+            resize: vertical;
         }
 
+        #purchasedItemsGroup {
+            display: none;
+        }
+        
+        #providerGroup {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+        }
+
+        .fa-shopping-cart {
+            color: var(--success);
+        }
+        
         h1 {
             color: var(--primary);
             font-size: 2.2rem;
@@ -97,6 +110,15 @@
             gap: 10px;
         }
 
+        h3 {
+            color: var(--primary);
+            font-size: 1.2rem;
+            margin: 20px 0 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
         .form-content {
             padding: 0 30px 30px;
         }
@@ -122,7 +144,7 @@
             top: 0;
         }
 
-        input, select {
+        input, select, textarea {
             width: 100%;
             padding: 12px 15px;
             border: 1px solid #ddd;
@@ -133,7 +155,7 @@
             background-color: rgba(255, 255, 255, 0.8);
         }
 
-        input:focus, select:focus {
+        input:focus, select:focus, textarea:focus {
             border-color: var(--primary);
             box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
             outline: none;
@@ -161,6 +183,57 @@
         button:hover {
             transform: translateY(-3px);
             box-shadow: 0 8px 20px rgba(67, 97, 238, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .device-card {
+            background-color: white;
+            border-radius: var(--border-radius);
+            padding: 20px;
+            margin: 15px 0;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            border-left: 4px solid var(--primary-light);
+            transition: var(--transition);
+        }
+
+        .device-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .device-count {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+        }
+
+        .device-count > div {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .device-count input {
+            width: 80px;
+            text-align: center;
+        }
+
+        .damage-type-group {
+            margin-top: 15px;
+            padding-right: 15px;
+            border-right: 2px solid #eee;
+            margin-bottom: 15px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .other-input {
+            margin-top: 10px;
+            animation: fadeIn 0.3s ease;
         }
 
         .requests-group {
@@ -221,6 +294,50 @@
             background-size: 12px;
         }
 
+        .radio-group {
+            display: flex;
+            gap: 20px;
+            margin-top: 10px;
+        }
+
+        .radio-item {
+            position: relative;
+        }
+
+        .radio-item input[type="radio"] {
+            position: absolute;
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .radio-item label {
+            display: inline-block;
+            padding: 8px 15px 8px 30px;
+            cursor: pointer;
+            transition: var(--transition);
+            margin: 0;
+        }
+
+        .radio-item label::before {
+            content: '';
+            position: absolute;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 18px;
+            height: 18px;
+            border: 2px solid var(--gray);
+            border-radius: 50%;
+            transition: var(--transition);
+        }
+
+        .radio-item input[type="radio"]:checked + label::before {
+            border-color: var(--primary);
+            background-color: var(--primary);
+            box-shadow: inset 0 0 0 3px white;
+        }
+
         .result-container {
             margin-top: 40px;
             padding: 30px;
@@ -256,6 +373,21 @@
             display: inline-flex;
             align-items: center;
             gap: 8px;
+        }
+
+        .rating-badge.A {
+            background-color: rgba(40, 167, 69, 0.1);
+            color: #28a745;
+        }
+
+        .rating-badge.B {
+            background-color: rgba(255, 193, 7, 0.1);
+            color: #ffc107;
+        }
+
+        .rating-badge.C {
+            background-color: rgba(220, 53, 69, 0.1);
+            color: #dc3545;
         }
 
         .eligibility-status {
@@ -304,6 +436,91 @@
             font-size: 1.2rem;
         }
 
+        .progress-container {
+            margin-top: 30px;
+            background-color: #f1f3f5;
+            border-radius: 50px;
+            height: 10px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary) 0%, var(--accent) 100%);
+            border-radius: 50px;
+            transition: width 1s ease;
+        }
+
+        .progress-labels {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+            font-size: 0.9rem;
+            color: var(--gray);
+        }
+
+        .visual-rating {
+            display: flex;
+            justify-content: center;
+            margin: 30px 0;
+        }
+
+        .rating-circle {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .rating-circle::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: conic-gradient(
+                var(--primary) 0%,
+                var(--accent) 100%
+            );
+            opacity: 0.1;
+            z-index: 0;
+        }
+
+        .rating-circle.A {
+            color: #28a745;
+            border: 5px solid rgba(40, 167, 69, 0.3);
+        }
+
+        .rating-circle.B {
+            color: #ffc107;
+            border: 5px solid rgba(255, 193, 7, 0.3);
+        }
+
+        .rating-circle.C {
+            color: #dc3545;
+            border: 5px solid rgba(220, 53, 69, 0.3);
+        }
+
+        .rating-circle .letter {
+            font-size: 2.5rem;
+            line-height: 1;
+            z-index: 1;
+        }
+
+        .rating-circle .text {
+            font-size: 0.9rem;
+            margin-top: 5px;
+            z-index: 1;
+        }
+        
         .condition-box {
             background-color: #e9f7ef;
             border-radius: var(--border-radius);
@@ -327,6 +544,40 @@
         
         .condition-desc {
             font-size: 0.95rem;
+        }
+        
+        .calculation-info {
+            background-color: #e7f3ff;
+            border-radius: var(--border-radius);
+            padding: 15px;
+            margin-top: 15px;
+            border-left: 4px solid var(--primary);
+        }
+        
+        .calculation-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: var(--primary);
+        }
+        
+        .calculation-desc {
+            font-size: 0.95rem;
+        }
+        
+        .fridge-condition {
+            background-color: #e6f7ff;
+            border-radius: var(--border-radius);
+            padding: 15px;
+            margin-top: 15px;
+            border-left: 4px solid #4cc9f0;
+        }
+        
+        .fridge-condition.not-met {
+            background-color: #fbeaea;
+            border-left: 4px solid #dc3545;
         }
 
         @keyframes fadeIn {
@@ -352,9 +603,20 @@
                 font-size: 1.3rem;
             }
             
+            .device-count {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+            
             .requests-group {
                 flex-direction: column;
                 align-items: flex-start;
+            }
+            
+            .radio-group {
+                flex-direction: column;
+                gap: 10px;
             }
         }
     </style>
@@ -362,58 +624,348 @@
 <body>
     <div class="container">
         <header>
-            <h1><i class="fas fa-heart"></i> نظام تقييم استحقاق العرائس للمساعدات</h1>
-            <p>تقييم الحالات الخاصة بالعروسة المكتوب كتابها حسب الشروط المحددة</p>
+            <h1><i class="fas fa-hand-holding-heart"></i> نظام تقييم استحقاق الأسر للمساعدات</h1>
+            <p>نظام قائم لتقييم الحالات الخاصة بنشاط المساعدات مع التركيز على العروسة المكتوب كتابها</p>
         </header>
         
         <div class="form-content">
-            <form id="brideForm">
+            <form id="familyForm">
                 <div class="form-section">
-                    <h2><i class="fas fa-user-alt"></i> بيانات العروسة</h2>
+                    <h2><i class="fas fa-users"></i> بيانات الأسرة</h2>
                     
                     <div class="form-group">
-                        <label for="brideName" class="required">اسم العروسة:</label>
-                        <input type="text" id="brideName" required placeholder="أدخل اسم العروسة">
+                        <label for="familyType" class="required">نوع الأسرة:</label>
+                        <select id="familyType" required>
+                            <option value="">-- اختر نوع الأسرة --</option>
+                            <option value="engaged">عروسة مخطوبة</option>
+                            <option value="married">عروسة مكتوب كتابها</option>
+                            <option value="family">أسرة</option>
+                        </select>
                     </div>
                     
                     <div class="form-group">
+                        <label for="familyName" class="required">اسم الأسرة / العروسة:</label>
+                        <input type="text" id="familyName" required placeholder="أدخل اسم الأسرة أو العروسة">
+                    </div>
+
+                    <div id="providerGroup" class="form-group" style="display: none;">
                         <label>هل يوجد عائل للعروسة؟</label>
-                        <div class="requests-group">
-                            <div class="request-item">
+                        <div class="radio-group">
+                            <div class="radio-item">
                                 <input type="radio" name="hasProvider" value="yes" id="providerYes">
                                 <label for="providerYes">نعم</label>
                             </div>
-                            <div class="request-item">
+                            <div class="radio-item">
                                 <input type="radio" name="hasProvider" value="no" id="providerNo" checked>
                                 <label for="providerNo">لا</label>
                             </div>
                         </div>
                     </div>
+                    
+                    <div class="form-group">
+                        <label for="familySize" class="required">عدد أفراد الأسرة:</label>
+                        <input type="number" id="familySize" min="1" required placeholder="أدخل عدد الأفراد">
+                    </div>
+                    
+                    <div id="elderlyGroup" class="form-group" style="display:none;">
+                        <label>هل يوجد مسن في الأسرة؟</label>
+                        <div class="radio-group">
+                            <div class="radio-item">
+                                <input type="radio" name="hasElderly" value="yes" id="elderlyYes">
+                                <label for="elderlyYes">نعم</label>
+                            </div>
+                            <div class="radio-item">
+                                <input type="radio" name="hasElderly" value="no" id="elderlyNo" checked>
+                                <label for="elderlyNo">لا</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="income" class="required">الدخل الشهري (جنيه):</label>
+                        <input type="number" id="income" min="0" required placeholder="أدخل إجمالي الدخل الشهري">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="expenses" class="required">المصروفات الشهرية (جنيه):</label>
+                        <input type="number" id="expenses" min="0" required placeholder="أدخل إجمالي المصروفات الشهرية">
+                    </div>
                 </div>
                 
                 <div class="form-section">
-                    <h2><i class="fas fa-gift"></i> الطلبات المقدمة</h2>
+                    <h2><i class="fas fa-couch"></i> الأجهزة المتوفرة حالياً</h2>
                     
-                    <div class="form-group">
-                        <label>الطلبات المقدمة من العروسة:</label>
-                        <div class="requests-group">
-                            <div class="request-item">
-                                <input type="checkbox" name="requests" value="بوتجاز" id="requestStove">
-                                <label for="requestStove"><i class="fas fa-fire"></i> بوتجاز</label>
+                    <div class="device-card">
+                        <h3><i class="fas fa-bed"></i> الأسرة والمراتب</h3>
+                        
+                        <div class="device-count">
+                            <div>
+                                <label for="bedsCount">عدد السرير المتوفرة:</label>
+                                <input type="number" id="bedsCount" min="0" value="0">
                             </div>
-                            <div class="request-item">
-                                <input type="checkbox" name="requests" value="غسالة هاف" id="requestHalfWasher">
-                                <label for="requestHalfWasher"><i class="fas fa-washing-machine"></i> غسالة هاف</label>
+                            <div>
+                                <label for="damagedBedsCount">عدد التالف منها:</label>
+                                <input type="number" id="damagedBedsCount" min="0" value="0">
                             </div>
+                        </div>
+                        
+                        <div class="device-count">
+                            <div>
+                                <label for="mattressesCount">عدد المراتب المتوفرة:</label>
+                                <input type="number" id="mattressesCount" min="0" value="0">
+                            </div>
+                            <div>
+                                <label for="damagedMattressesCount">عدد التالف منها:</label>
+                                <input type="number" id="damagedMattressesCount" min="0" value="0">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="device-card">
+                        <h3><i class="fas fa-utensils"></i> أجهزة المطبخ</h3>
+                        
+                        <div class="device-count">
+                            <div>
+                                <label for="stovesCount">عدد البوتجاز المتوفرة:</label>
+                                <input type="number" id="stovesCount" min="0" value="0">
+                            </div>
+                            <div>
+                                <label for="damagedStovesCount">عدد التالف منها:</label>
+                                <input type="number" id="damagedStovesCount" min="0" value="0">
+                            </div>
+                        </div>
+                        
+                        <div id="stoveDamageTypeGroup" class="damage-type-group" style="display: none;">
+                            <label for="stoveDamageType">نوع تلف البوتجاز:</label>
+                            <select id="stoveDamageType" onchange="toggleStoveOther(this)">
+                                <option value="بيهب">بيهب</option>
+                                <option value="بيسرب غاز">بيسرب غاز</option>
+                                <option value="برومة">برومة</option>
+                                <option value="غير ذلك">غير ذلك</option>
+                            </select>
+                            <div id="stoveOther" class="other-input" style="display: none;">
+                                <input type="text" placeholder="حدد نوع التلف">
+                            </div>
+                        </div>
+                        
+                        <div id="stoveRepairAttemptGroup" class="damage-type-group" style="display: none;">
+                            <label>هل تم محاولة إصلاحه من قبل؟</label>
+                            <div class="radio-group">
+                                <div class="radio-item">
+                                    <input type="radio" name="stoveRepairAttempt" value="yes" id="stoveRepairYes">
+                                    <label for="stoveRepairYes">نعم</label>
+                                </div>
+                                <div class="radio-item">
+                                    <input type="radio" name="stoveRepairAttempt" value="no" id="stoveRepairNo" checked>
+                                    <label for="stoveRepairNo">لا</label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div style="margin-top: 15px;">
                             <div class="request-item">
-                                <input type="checkbox" name="requests" value="ثلاجة" id="requestFridge">
-                                <label for="requestFridge"><i class="fas fa-snowflake"></i> ثلاجة</label>
+                                <input type="checkbox" id="hasOven">
+                                <label for="hasOven"><i class="fas fa-fire"></i> لديهم فرن</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="device-card">
+                        <h3><i class="fas fa-washing-machine"></i> الغسالات</h3>
+                        
+                        <div class="device-count">
+                            <div>
+                                <label for="washersCount">عدد الغسالات العادية المتوفرة:</label>
+                                <input type="number" id="washersCount" min="0" value="0">
+                            </div>
+                            <div>
+                                <label for="damagedWashersCount">عدد التالف منها:</label>
+                                <input type="number" id="damagedWashersCount" min="0" value="0">
+                            </div>
+                        </div>
+                        
+                        <div id="washerDamageTypeGroup" class="damage-type-group" style="display: none;">
+                            <label for="washerDamageType">نوع تلف الغسالة العادية:</label>
+                            <select id="washerDamageType" onchange="toggleWasherOther(this)">
+                                <option value="موتور">موتور</option>
+                                <option value="برومة">برومة</option>
+                                <option value="عصر">عصر</option>
+                                <option value="مروحة">مروحة</option>
+                                <option value="غير ذلك">غير ذلك</option>
+                            </select>
+                            <div id="washerOther" class="other-input" style="display: none;">
+                                <input type="text" placeholder="حدد نوع التلف">
+                            </div>
+                        </div>
+                        
+                        <div id="washerRepairAttemptGroup" class="damage-type-group" style="display: none;">
+                            <label>هل تم محاولة إصلاحه من قبل؟</label>
+                            <div class="radio-group">
+                                <div class="radio-item">
+                                    <input type="radio" name="washerRepairAttempt" value="yes" id="washerRepairYes">
+                                    <label for="washerRepairYes">نعم</label>
+                                </div>
+                                <div class="radio-item">
+                                    <input type="radio" name="washerRepairAttempt" value="no" id="washerRepairNo" checked>
+                                    <label for="washerRepairNo">لا</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="device-count">
+                            <div>
+                                <label for="halfWashersCount">عدد الغسالات هاف المتوفرة:</label>
+                                <input type="number" id="halfWashersCount" min="0" value="0">
+                            </div>
+                            <div>
+                                <label for="damagedHalfWashersCount">عدد التالف منها:</label>
+                                <input type="number" id="damagedHalfWashersCount" min="0" value="0">
+                            </div>
+                        </div>
+                        
+                        <div id="halfWasherDamageTypeGroup" class="damage-type-group" style="display: none;">
+                            <label for="halfWasherDamageType">نوع تلف الغسالة الهاف:</label>
+                            <select id="halfWasherDamageType" onchange="toggleHalfWasherOther(this)">
+                                <option value="موتور">موتور</option>
+                                <option value="برومة">برومة</option>
+                                <option value="عصر">عصر</option>
+                                <option value="مروحة">مروحة</option>
+                                <option value="غير ذلك">غير ذلك</option>
+                            </select>
+                            <div id="halfWasherOther" class="other-input" style="display: none;">
+                                <input type="text" placeholder="حدد نوع التلف">
+                            </div>
+                        </div>
+                        
+                        <div id="halfWasherRepairAttemptGroup" class="damage-type-group" style="display: none;">
+                            <label>هل تم محاولة إصلاحه من قبل؟</label>
+                            <div class="radio-group">
+                                <div class="radio-item">
+                                    <input type="radio" name="halfWasherRepairAttempt" value="yes" id="halfWasherRepairYes">
+                                    <label for="halfWasherRepairYes">نعم</label>
+                                </div>
+                                <div class="radio-item">
+                                    <input type="radio" name="halfWasherRepairAttempt" value="no" id="halfWasherRepairNo" checked>
+                                    <label for="halfWasherRepairNo">لا</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="device-card">
+                        <h3><i class="fas fa-snowflake"></i> الثلاجات</h3>
+                        
+                        <div class="device-count">
+                            <div>
+                                <label for="fridgesCount">عدد الثلاجات المتوفرة:</label>
+                                <input type="number" id="fridgesCount" min="0" value="0">
+                            </div>
+                            <div>
+                                <label for="damagedFridgesCount">عدد التالف منها:</label>
+                                <input type="number" id="damagedFridgesCount" min="0" value="0">
+                            </div>
+                        </div>
+                        
+                        <div id="fridgeDamageTypeGroup" class="damage-type-group" style="display: none;">
+                            <label for="fridgeDamageType">نوع تلف الثلاجة:</label>
+                            <select id="fridgeDamageType" onchange="toggleFridgeOther(this)">
+                                <option value="موتور">موتور</option>
+                                <option value="برومة">برومة</option>
+                                <option value="باب الثلاجة مكسور">باب الثلاجة مكسور</option>
+                                <option value="غير ذلك">غير ذلك</option>
+                            </select>
+                            <div id="fridgeOther" class="other-input" style="display: none;">
+                                <input type="text" placeholder="حدد نوع التلف">
+                            </div>
+                        </div>
+                        
+                        <div id="fridgeRepairAttemptGroup" class="damage-type-group" style="display: none;">
+                            <label>هل تم محاولة إصلاحه من قبل؟</label>
+                            <div class="radio-group">
+                                <div class="radio-item">
+                                    <input type="radio" name="fridgeRepairAttempt" value="yes" id="fridgeRepairYes">
+                                    <label for="fridgeRepairYes">نعم</label>
+                                </div>
+                                <div class="radio-item">
+                                    <input type="radio" name="fridgeRepairAttempt" value="no" id="fridgeRepairNo" checked>
+                                    <label for="fridgeRepairNo">لا</label>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
                 
-                <button type="button" onclick="evaluateBride()">
+                <div class="form-section">
+                    <h2><i class="fas fa-hands-helping"></i> الطلبات والاحتياجات</h2>
+                    
+                    <div class="form-group">
+                        <label>الطلبات على لسان الأسرة:</label>
+                        <div class="requests-group">
+                            <div class="request-item">
+                                <input type="checkbox" name="requests" value="ثلاجة" id="requestFridge">
+                                <label for="requestFridge"><i class="fas fa-snowflake"></i> ثلاجة</label>
+                            </div>
+                            <div class="request-item">
+                                <input type="checkbox" name="requests" value="غسالة" id="requestWasher">
+                                <label for="requestWasher"><i class="fas fa-washing-machine"></i> غسالة</label>
+                            </div>
+                            <div class="request-item">
+                                <input type="checkbox" name="requests" value="بوتجاز" id="requestStove">
+                                <label for="requestStove"><i class="fas fa-fire"></i> بوتجاز</label>
+                            </div>
+                            <div class="request-item">
+                                <input type="checkbox" name="requests" value="سرير" id="requestBed">
+                                <label for="requestBed"><i class="fas fa-bed"></i> سرير</label>
+                            </div>
+                            <div class="request-item">
+                                <input type="checkbox" name="requests" value="مرتبة" id="requestMattress">
+                                <label for="requestMattress"><i class="fas fa-bed"></i> مرتبة</label>
+                            </div>
+                            <div class="request-item">
+                                <input type="checkbox" name="requests" value="غير ذلك" id="requestOther" onchange="toggleOtherRequest(this)">
+                                <label for="requestOther"><i class="fas fa-ellipsis-h"></i> غير ذلك</label>
+                            </div>
+                        </div>
+                        <div id="otherRequest" class="other-input" style="display: none;">
+                            <input type="text" placeholder="حدد الطلب الآخر">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group" id="medicalConditionsGroup" style="display:none;">
+                        <label>هل يوجد أفراد بحاجة لحفظ أدوية (مريض سكر يحتاج أنسولين، أمراض كبد، إلخ)؟</label>
+                        <div class="radio-group">
+                            <div class="radio-item">
+                                <input type="radio" name="medicalConditions" value="yes" id="medicalYes">
+                                <label for="medicalYes">نعم</label>
+                            </div>
+                            <div class="radio-item">
+                                <input type="radio" name="medicalConditions" value="no" id="medicalNo" checked>
+                                <label for="medicalNo">لا</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group" id="smallApartmentGroup" style="display:none;">
+                        <label>هل الشقة صغيرة ولا يوجد مكان كافي للأثاث؟</label>
+                        <div class="radio-group">
+                            <div class="radio-item">
+                                <input type="radio" name="smallApartment" value="yes" id="apartmentYes">
+                                <label for="apartmentYes">نعم</label>
+                            </div>
+                            <div class="radio-item">
+                                <input type="radio" name="smallApartment" value="no" id="apartmentNo" checked>
+                                <label for="apartmentNo">لا</label>
+                            </div>
+                        </div>
+                    </div>           
+                </div>
+                
+                <div id="purchasedItemsGroup" class="form-group">
+                    <label for="purchasedItems">ما تم شراؤه بالفعل:</label>
+                    <textarea id="purchasedItems" rows="3" placeholder="أدخل الأغراض التي تم شراؤها مسبقاً"></textarea>
+                </div>
+               
+                <button type="button" onclick="evaluateFamily()">
                     <i class="fas fa-calculator"></i> تقييم الاستحقاق
                 </button>
             </form>
@@ -423,7 +975,7 @@
                     <div class="result-title">
                         <i class="fas fa-clipboard-check"></i> نتيجة التقييم
                     </div>
-                    <div id="ratingBadge" class="rating-badge">موافق</div>
+                    <div id="ratingBadge" class="rating-badge A">A</div>
                 </div>
                 
                 <div id="eligibilityStatus" class="eligibility-status eligible">
@@ -434,72 +986,358 @@
                     </div>
                 </div>
                 
-                <div id="devicesNeeded" class="devices-list"></div>
-                
-                <div id="conditionBox" class="condition-box">
-                    <div class="condition-title">
-                        <i class="fas fa-info-circle"></i>
-                        <span>شروط التقييم المطبقة</span>
+                <div class="visual-rating">
+                    <div id="ratingCircle" class="rating-circle A">
+                        <div class="letter">A</div>
+                        <div class="text">ممتاز</div>
                     </div>
-                    <div id="conditionText" class="condition-desc"></div>
                 </div>
+                
+                <div class="progress-container">
+                    <div id="progressBar" class="progress-bar" style="width: 90%"></div>
+                </div>
+                <div class="progress-labels">
+                    <span>أقل احتياج</span>
+                    <span>أكثر احتياج</span>
+                </div>
+                
+                <div id="marriedRulesInfo" class="calculation-info" style="display: none;">
+                    <div class="calculation-title">
+                        <i class="fas fa-ring"></i>
+                        <span>قواعد خاصة بالعروسة المكتوب كتابها</span>
+                    </div>
+                    <div id="marriedRulesText" class="calculation-desc"></div>
+                </div>
+                
+                <div id="washerCondition" class="condition-box">
+                    <div class="condition-title">
+                        <i class="fas fa-washing-machine"></i>
+                        <span>شروط الحصول على غسالة</span>
+                    </div>
+                    <div id="washerConditionText" class="condition-desc"></div>
+                </div>
+                
+                <div id="fridgeCondition" class="fridge-condition">
+                    <div class="condition-title">
+                        <i class="fas fa-snowflake"></i>
+                        <span>شروط الحصول على ثلاجة</span>
+                    </div>
+                    <div id="fridgeConditionText" class="condition-desc"></div>
+                </div>
+                
+                <div id="devicesNeeded" class="devices-list"></div>
             </div>
         </div>
     </div>
 
     <script>
-        // دالة تقييم العروسة حسب الشروط المحددة
-        function evaluateBride() {
+        // إظهار/إخفاء الحقول حسب نوع الأسرة
+        document.getElementById('familyType').addEventListener('change', function() {
+            const familyType = this.value;
+            const providerGroup = document.getElementById('providerGroup');
+            const purchasedItemsGroup = document.getElementById('purchasedItemsGroup');
+            const medicalConditionsGroup = document.getElementById('medicalConditionsGroup');
+            const smallApartmentGroup = document.getElementById('smallApartmentGroup');
+            const elderlyGroup = document.getElementById('elderlyGroup');
+            
+            // إظهار حقل العائل وما تم شراؤه للعروسة فقط
+            if (familyType === 'engaged' || familyType === 'married') {
+                providerGroup.style.display = 'block';
+                purchasedItemsGroup.style.display = 'block';
+            } else {
+                providerGroup.style.display = 'none';
+                purchasedItemsGroup.style.display = 'none';
+            }
+            
+            if (familyType === 'family') {
+                medicalConditionsGroup.style.display = 'block';
+                smallApartmentGroup.style.display = 'block';
+                elderlyGroup.style.display = 'block';
+            } else {
+                medicalConditionsGroup.style.display = 'none';
+                smallApartmentGroup.style.display = 'none';
+                elderlyGroup.style.display = 'none';
+            }
+        });
+        
+        // إظهار/إخفاء نوع تلف البوتجاز ومحاولة الإصلاح عند إدخال عدد التالف
+        document.getElementById('damagedStovesCount').addEventListener('input', function() {
+            const damageTypeGroup = document.getElementById('stoveDamageTypeGroup');
+            const repairGroup = document.getElementById('stoveRepairAttemptGroup');
+            if (this.value > 0) {
+                damageTypeGroup.style.display = 'block';
+                repairGroup.style.display = 'block';
+            } else {
+                damageTypeGroup.style.display = 'none';
+                repairGroup.style.display = 'none';
+            }
+        });
+        
+        // إظهار/إخفاء نوع تلف الغسالة العادية ومحاولة الإصلاح
+        document.getElementById('damagedWashersCount').addEventListener('input', function() {
+            const damageTypeGroup = document.getElementById('washerDamageTypeGroup');
+            const repairGroup = document.getElementById('washerRepairAttemptGroup');
+            if (this.value > 0) {
+                damageTypeGroup.style.display = 'block';
+                repairGroup.style.display = 'block';
+            } else {
+                damageTypeGroup.style.display = 'none';
+                repairGroup.style.display = 'none';
+            }
+        });
+        
+        // إظهار/إخفاء نوع تلف الغسالة الهاف ومحاولة الإصلاح
+        document.getElementById('damagedHalfWashersCount').addEventListener('input', function() {
+            const damageTypeGroup = document.getElementById('halfWasherDamageTypeGroup');
+            const repairGroup = document.getElementById('halfWasherRepairAttemptGroup');
+            if (this.value > 0) {
+                damageTypeGroup.style.display = 'block';
+                repairGroup.style.display = 'block';
+            } else {
+                damageTypeGroup.style.display = 'none';
+                repairGroup.style.display = 'none';
+            }
+        });
+        
+        // إظهار/إخفاء نوع تلف الثلاجة ومحاولة الإصلاح
+        document.getElementById('damagedFridgesCount').addEventListener('input', function() {
+            const damageTypeGroup = document.getElementById('fridgeDamageTypeGroup');
+            const repairGroup = document.getElementById('fridgeRepairAttemptGroup');
+            if (this.value > 0) {
+                damageTypeGroup.style.display = 'block';
+                repairGroup.style.display = 'block';
+            } else {
+                damageTypeGroup.style.display = 'none';
+                repairGroup.style.display = 'none';
+            }
+        });
+        
+        // إدارة الحقول الإضافية عند اختيار "غير ذلك" للبوتجاز
+        function toggleStoveOther(select) {
+            const otherInput = document.getElementById('stoveOther');
+            otherInput.style.display = select.value === 'غير ذلك' ? 'block' : 'none';
+            if(select.value !== 'غير ذلك') otherInput.querySelector('input').value = '';
+        }
+        
+        // إدارة الحقول الإضافية عند اختيار "غير ذلك" للغسالة العادية
+        function toggleWasherOther(select) {
+            const otherInput = document.getElementById('washerOther');
+            otherInput.style.display = select.value === 'غير ذلك' ? 'block' : 'none';
+            if(select.value !== 'غير ذلك') otherInput.querySelector('input').value = '';
+        }
+        
+        // إدارة الحقول الإضافية عند اختيار "غير ذلك" للغسالة الهاف
+        function toggleHalfWasherOther(select) {
+            const otherInput = document.getElementById('halfWasherOther');
+            otherInput.style.display = select.value === 'غير ذلك' ? 'block' : 'none';
+            if(select.value !== 'غير ذلك') otherInput.querySelector('input').value = '';
+        }
+        
+        // إدارة الحقول الإضافية عند اختيار "غير ذلك" للثلاجة
+        function toggleFridgeOther(select) {
+            const otherInput = document.getElementById('fridgeOther');
+            otherInput.style.display = select.value === 'غير ذلك' ? 'block' : 'none';
+            if(select.value !== 'غير ذلك') otherInput.querySelector('input').value = '';
+        }
+        
+        // إدارة الحقل الإضافي لطلب "غير ذلك"
+        function toggleOtherRequest(checkbox) {
+            const otherInput = document.getElementById('otherRequest');
+            otherInput.style.display = checkbox.checked ? 'block' : 'none';
+            if (!checkbox.checked) otherInput.querySelector('input').value = '';
+        }
+        
+        // دالة تقييم الأسرة
+        function evaluateFamily() {
             // جمع البيانات الأساسية
-            const brideName = document.getElementById('brideName').value;
-            const hasProvider = document.querySelector('input[name="hasProvider"]:checked').value === 'yes';
+            const familyType = document.getElementById('familyType').value;
+            const familyName = document.getElementById('familyName').value;
+            const familySize = parseInt(document.getElementById('familySize').value);
+            const income = parseFloat(document.getElementById('income').value);
+            const expenses = parseFloat(document.getElementById('expenses').value);
+            const hasElderly = document.querySelector('input[name="hasElderly"]:checked')?.value === 'yes';
+            const hasProvider = document.querySelector('input[name="hasProvider"]:checked')?.value === 'yes';
+            const purchasedItems = document.getElementById('purchasedItems').value;
+
+            // جمع بيانات الأجهزة
+            const bedsCount = parseInt(document.getElementById('bedsCount').value);
+            const damagedBedsCount = parseInt(document.getElementById('damagedBedsCount').value);
+            const mattressesCount = parseInt(document.getElementById('mattressesCount').value);
+            const damagedMattressesCount = parseInt(document.getElementById('damagedMattressesCount').value);
+            const stovesCount = parseInt(document.getElementById('stovesCount').value);
+            const damagedStovesCount = parseInt(document.getElementById('damagedStovesCount').value);
+            const hasOven = document.getElementById('hasOven').checked;
+            const washersCount = parseInt(document.getElementById('washersCount').value);
+            const damagedWashersCount = parseInt(document.getElementById('damagedWashersCount').value);
+            const halfWashersCount = parseInt(document.getElementById('halfWashersCount').value);
+            const damagedHalfWashersCount = parseInt(document.getElementById('damagedHalfWashersCount').value);
+            const fridgesCount = parseInt(document.getElementById('fridgesCount').value);
+            const damagedFridgesCount = parseInt(document.getElementById('damagedFridgesCount').value);
             
             // جمع الطلبات
             const requests = Array.from(document.querySelectorAll('input[name="requests"]:checked'))
-                .map(checkbox => checkbox.value);
-            
-            // تطبيق شروط التقييم
-            let approvedDevices = [];
-            let conditionText = '';
+                .map(checkbox => {
+                    if (checkbox.value === 'غير ذلك') {
+                        const value = document.getElementById('otherRequest').querySelector('input').value.trim();
+                        return { value, isCustom: true };
+                    } else {
+                        return { value: checkbox.value, isCustom: false };
+                    }
+                })
+                .filter(request => request.value !== '');
+
+            // تحديد الأجهزة المطلوبة
+            const neededDevices = [];
+            const addedDevices = new Set();
             let additionalNotes = '';
+            let marriedRules = '';
             
-            // الشرط 1: بوتجاز + غسالة هاف
-            if (requests.includes('بوتجاز') && requests.includes('غسالة هاف')) {
-                approvedDevices = ['بوتجاز', 'غسالة هاف'];
-                conditionText = 'بسبب طلب البوتجاز والغسالة هاف معاً - نجاح في التقييم';
+            // تطبيق القواعد الخاصة بالعروسة المكتوب كتابها
+            const marriedRulesInfo = document.getElementById('marriedRulesInfo');
+            const marriedRulesText = document.getElementById('marriedRulesText');
+            
+            if (familyType === 'married') {
+                marriedRulesInfo.style.display = 'block';
+                
+                // استخراج الطلبات الخاصة بالأجهزة الأساسية
+                const hasFridgeRequest = requests.some(r => r.value === 'ثلاجة');
+                const hasWasherRequest = requests.some(r => r.value === 'غسالة');
+                const hasStoveRequest = requests.some(r => r.value === 'بوتجاز');
+                
+                // تطبيق القواعد
+                if (hasStoveRequest && hasWasherRequest) {
+                    neededDevices.push('بوتجاز');
+                    neededDevices.push('غسالة هاف');
+                    addedDevices.add('بوتجاز');
+                    addedDevices.add('غسالة هاف');
+                    marriedRules += '<p>الطلبات: بوتجاز وغسالة هاف → تمت الموافقة على كليهما</p>';
+                }
+                else if (hasStoveRequest) {
+                    neededDevices.push('بوتجاز');
+                    addedDevices.add('بوتجاز');
+                    marriedRules += '<p>الطلبات: بوتجاز فقط → تمت الموافقة عليه</p>';
+                }
+                else if (hasWasherRequest) {
+                    neededDevices.push('غسالة هاف');
+                    addedDevices.add('غسالة هاف');
+                    marriedRules += '<p>الطلبات: غسالة فقط → تمت الموافقة على غسالة هاف</p>';
+                }
+                
+                if (hasFridgeRequest && !hasProvider) {
+                    if (requests.filter(r => r.value === 'ثلاجة').length === 1) {
+                        neededDevices.push('ثلاجة');
+                        addedDevices.add('ثلاجة');
+                        marriedRules += '<p>الطلبات: ثلاجة فقط ولا يوجد عائل → تمت الموافقة على الثلاجة</p>';
+                    } else if ((hasStoveRequest || hasWasherRequest) && !hasProvider) {
+                        neededDevices.push('ثلاجة');
+                        addedDevices.add('ثلاجة');
+                        marriedRules += '<p>الطلبات: ثلاجة وأجهزة أخرى ولا يوجد عائل → تمت الموافقة على الثلاجة والأجهزة الأخرى</p>';
+                    }
+                }
+                
+                if (hasFridgeRequest && hasStoveRequest && hasWasherRequest) {
+                    // إزالة الثلاجة إذا تمت إضافتها في الخطوة السابقة
+                    neededDevices.splice(neededDevices.indexOf('ثلاجة'), 1);
+                    addedDevices.delete('ثلاجة');
+                    marriedRules += '<p>الطلبات: بوتجاز وغسالة هاف وثلاجة → تمت الموافقة على بوتجاز وغسالة هاف فقط</p>';
+                }
+                
+                // إضافة ملاحظة إذا طلبت الثلاجة ولكن يوجد عائل
+                if (hasFridgeRequest && hasProvider) {
+                    marriedRules += '<p>الطلبات: ثلاجة مع وجود عائل → لم تتم الموافقة على الثلاجة</p>';
+                }
+            } else {
+                marriedRulesInfo.style.display = 'none';
             }
-            // الشرط 2: بوتجاز فقط أو غسالة هاف فقط
-            else if (
-                (requests.includes('بوتجاز') && !requests.includes('غسالة هاف') && !requests.includes('ثلاجة')) ||
-                (requests.includes('غسالة هاف') && !requests.includes('بوتجاز') && !requests.includes('ثلاجة'))
-            ) {
-                approvedDevices = requests.filter(req => req === 'بوتجاز' || req === 'غسالة هاف');
-                conditionText = 'بسبب طلب جهاز واحد فقط (بوتجاز أو غسالة هاف) - نجاح في التقييم';
-            }
-            // الشرط 3: ثلاجة فقط بدون عائل
-            else if (requests.includes('ثلاجة') && requests.length === 1 && !hasProvider) {
-                approvedDevices = ['ثلاجة'];
-                conditionText = 'بسبب طلب الثلاجة فقط وعدم وجود عائل - نجاح في التقييم';
-            }
-            // الشرط 4: ثلاجة + جهاز آخر بدون عائل
-            else if (
-                requests.includes('ثلاجة') && 
-                (requests.includes('بوتجاز') || requests.includes('غسالة هاف')) &&
-                !hasProvider
-            ) {
-                approvedDevices = requests;
-                conditionText = 'بسبب طلب الثلاجة مع جهاز آخر وعدم وجود عائل - نجاح في التقييم';
-            }
-            // الشرط 5: ثلاثة أجهزة
-            else if (requests.length === 3) {
-                approvedDevices = ['بوتجاز', 'غسالة هاف'];
-                conditionText = 'بسبب طلب 3 أجهزة (يتم الموافقة على البوتجاز والغسالة هاف فقط)';
-                additionalNotes = 'لموافقة على البوتجاز والغسالة هاف فقط حسب الشروط';
-            }
-            // الحالات غير المستوفية للشروط
-            else {
-                conditionText = 'لا تنطبق شروط الاستحقاق على هذه الحالة';
-                additionalNotes = 'يرجى مراجعة الشروط المحددة لتقييم حالة العروسة';
+            
+            marriedRulesText.innerHTML = marriedRules;
+            
+            // معالجة الطلبات الأخرى للأنواع الأخرى من الأسر
+            requests.forEach(requestObj => {
+                const request = requestObj.value;
+                const isCustom = requestObj.isCustom;
+                
+                if (addedDevices.has(request)) return;
+                
+                if (isCustom) {
+                    neededDevices.push(request);
+                    addedDevices.add(request);
+                } else {
+                    switch (request) {
+                        case 'سرير':
+                            const requiredBeds = Math.ceil(familySize / 1.5);
+                            const workingBeds = bedsCount - damagedBedsCount;
+                            const neededBeds = Math.max(0, requiredBeds - workingBeds);
+                            
+                            if (neededBeds > 0) {
+                                neededDevices.push(`سرير (${neededBeds} عدد)`);
+                                addedDevices.add('سرير');
+                            }
+                            break;
+                            
+                        case 'مرتبة':
+                            const requiredMattresses = Math.ceil(familySize / 1.5);
+                            const workingMattresses = mattressesCount - damagedMattressesCount;
+                            const neededMattresses = Math.max(0, requiredMattresses - workingMattresses);
+                            
+                            if (neededMattresses > 0) {
+                                neededDevices.push(`مرتبة (${neededMattresses} عدد)`);
+                                addedDevices.add('مرتبة');
+                            }
+                            break;
+                            
+                        case 'بوتجاز':
+                            const hasWorkingStove = (stovesCount - damagedStovesCount) > 0;
+                            if (!hasWorkingStove && !hasOven) {
+                                neededDevices.push('بوتجاز');
+                                addedDevices.add('بوتجاز');
+                            }
+                            break;
+                            
+                        case 'غسالة':
+                            const hasWorkingWasher = (washersCount - damagedWashersCount) > 0 || 
+                                                    (halfWashersCount - damagedHalfWashersCount) > 0;
+                            if (!hasWorkingWasher) {
+                                neededDevices.push('غسالة');
+                                addedDevices.add('غسالة');
+                            }
+                            break;
+                            
+                        case 'ثلاجة':
+                            const hasWorkingFridge = (fridgesCount - damagedFridgesCount) > 0;
+                            if (!hasWorkingFridge) {
+                                neededDevices.push('ثلاجة');
+                                addedDevices.add('ثلاجة');
+                            }
+                            break;
+                            
+                        default:
+                            if (!addedDevices.has(request)) {
+                                neededDevices.push(request);
+                                addedDevices.add(request);
+                            }
+                    }
+                }
+            });
+
+            // حساب تصنيف الاستحقاق وعرض النتائج
+            const netIncome = income - expenses;
+            let rating = 'C';
+            let ratingText = 'منخفض';
+            let progressWidth = 30;
+
+            if (netIncome <= 750) {
+                rating = 'A';
+                ratingText = 'عالي جداً';
+                progressWidth = 90;
+                additionalNotes += 'الأسرة في حاجة ماسة للمساعدة بناءً على الدخل المنخفض. ';
+            } else if (netIncome <= 1500) {
+                rating = 'B';
+                ratingText = 'متوسط';
+                progressWidth = 60;
+                additionalNotes += 'الأسرة في حاجة للمساعدة ولكن ليست في حالة طارئة. ';
+            } else {
+                additionalNotes += 'الأسرة لديها دخل كافٍ نسبياً، يمكن النظر في حالات خاصة. ';
             }
 
             // عرض النتائج
@@ -507,29 +1345,82 @@
             const eligibilityStatus = document.getElementById('eligibilityStatus');
             const devicesNeededDiv = document.getElementById('devicesNeeded');
             const ratingBadge = document.getElementById('ratingBadge');
-            const conditionBox = document.getElementById('conditionBox');
-            const conditionTextDiv = document.getElementById('conditionText');
+            const ratingCircle = document.getElementById('ratingCircle');
+            const progressBar = document.getElementById('progressBar');
+            const washerConditionDiv = document.getElementById('washerCondition');
+            const fridgeConditionDiv = document.getElementById('fridgeCondition');
+
+            ratingBadge.className = `rating-badge ${rating}`;
+            ratingBadge.textContent = rating;
+            ratingCircle.className = `rating-circle ${rating}`;
+            ratingCircle.querySelector('.letter').textContent = rating;
+            ratingCircle.querySelector('.text').textContent = ratingText;
+            progressBar.style.width = `${progressWidth}%`;
+
+            // تحديث حالة شرط الغسالة
+            if (document.getElementById('requestWasher').checked) {
+                washerConditionDiv.style.display = 'block';
+    
+                if (familySize === 1) {
+                    washerConditionDiv.querySelector('.condition-desc').innerHTML = `
+                        <p>لا تستحق الأسرة غسالة إلا إذا كان الفرد مسنًا</p>
+                        <p><strong>عدد الأفراد:</strong> ${familySize}</p>
+                        <p><strong>هل يوجد مسن؟</strong> ${hasElderly ? 'نعم' : 'لا'}</p>
+                    `;
+                } else if (familySize === 2) {
+                    washerConditionDiv.querySelector('.condition-desc').innerHTML = `
+                        <p>تستحق الأسرة غسالة عادية لأن عدد الأسرة 2</p>
+                        <p><strong>عدد الأسرة:</strong> ${familySize}</p>
+                    `;
+                } else if (familySize >= 3) {
+                    washerConditionDiv.querySelector('.condition-desc').innerHTML = `
+                        <p>تستحق الأسرة غسالة هاف لأن عدد الأسرة 3 أو أكثر</p>
+                        <p><strong>عدد الأسرة:</strong> ${familySize}</p>
+                    `;
+                }
+            } else {
+                washerConditionDiv.style.display = 'none';
+            }
             
-            conditionTextDiv.innerHTML = conditionText;
-            
-            if (approvedDevices.length > 0) {
-                ratingBadge.className = 'rating-badge';
-                ratingBadge.textContent = 'موافق';
-                ratingBadge.style.backgroundColor = 'rgba(40, 167, 69, 0.1)';
-                ratingBadge.style.color = '#28a745';
-                
+            // تحديث حالة شرط الثلاجة
+            if (document.getElementById('requestFridge').checked) {
+                fridgeConditionDiv.style.display = 'block';
+                fridgeConditionDiv.querySelector('.condition-desc').innerHTML = `
+                    <p>شروط استحقاق الثلاجة:</p>
+                    <ul>
+                        <li>وجود حالات طبية تتطلب ثلاجة</li>
+                        <li>عدد أفراد الأسرة 7 أو أكثر</li>
+                        <li>عدم وجود ثلاجة عاملة في المنزل</li>
+                    </ul>
+                `;
+            } else {
+                fridgeConditionDiv.style.display = 'none';
+            }
+
+            let purchasedItemsHTML = '';
+            if (purchasedItems) {
+                purchasedItemsHTML = `
+                    <h3><i class="fas fa-shopping-cart"></i> الأغراض المشتراة مسبقاً:</h3>
+                    <div class="device-item">
+                        <i class="fas fa-check-circle"></i>
+                        <span>${purchasedItems}</span>
+                    </div>
+                `;
+            }
+
+            if (neededDevices.length > 0) {
                 eligibilityStatus.className = 'eligibility-status eligible';
                 eligibilityStatus.innerHTML = `
                     <i class="fas fa-check-circle" style="color: #28a745; font-size: 1.5rem;"></i>
                     <div>
-                        <p>العروسة <strong>${brideName}</strong> مؤهلة للحصول على المساعدات.</p>
+                        <p>الأسرة/العروسة <strong>${familyName}</strong> مؤهلة للحصول على المساعدات.</p>
                         <p style="margin-top: 10px; font-size: 0.95rem;">${additionalNotes}</p>
                     </div>
                 `;
 
                 devicesNeededDiv.innerHTML = `
-                    <h3><i class="fas fa-gift"></i> الأجهزة المعتمدة:</h3>
-                    ${approvedDevices
+                    <h3><i class="fas fa-box-open"></i> الأجهزة المعتمدة:</h3>
+                    ${neededDevices
                         .map(
                             device => `
                         <div class="device-item">
@@ -539,22 +1430,18 @@
                     `
                         )
                         .join('')}
+                    ${purchasedItemsHTML}
                 `;
             } else {
-                ratingBadge.className = 'rating-badge';
-                ratingBadge.textContent = 'غير موافق';
-                ratingBadge.style.backgroundColor = 'rgba(220, 53, 69, 0.1)';
-                ratingBadge.style.color = '#dc3545';
-                
                 eligibilityStatus.className = 'eligibility-status not-eligible';
                 eligibilityStatus.innerHTML = `
                     <i class="fas fa-times-circle" style="color: #dc3545; font-size: 1.5rem;"></i>
                     <div>
-                        <p>العروسة <strong>${brideName}</strong> غير مؤهلة بناءً على الشروط.</p>
+                        <p>الأسرة/العروسة <strong>${familyName}</strong> غير مؤهلة بناءً على الطلبات المقدمة.</p>
                         <p style="margin-top: 10px; font-size: 0.95rem;">${additionalNotes}</p>
                     </div>
                 `;
-                devicesNeededDiv.innerHTML = '';
+                devicesNeededDiv.innerHTML = purchasedItemsHTML;
             }
 
             resultDiv.style.display = 'block';
