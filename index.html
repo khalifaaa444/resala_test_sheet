@@ -1166,14 +1166,44 @@
             const damagedMattressesCount = parseInt(document.getElementById('damagedMattressesCount').value);
             const stovesCount = parseInt(document.getElementById('stovesCount').value);
             const damagedStovesCount = parseInt(document.getElementById('damagedStovesCount').value);
-            const hasOven = document.getElementById('hasOven').checked;
+            const stoveDamageType =
+            	damagedStovesCount > 0
+                    ? document.getElementById('stoveDamageType').value === 'غير ذلك'
+                        ? document.getElementById('stoveOther').querySelector('input').value
+                        : document.getElementById('stoveDamageType').value
+                    : '';
+	    const hasOven = document.getElementById('hasOven').checked;
             const washersCount = parseInt(document.getElementById('washersCount').value);
             const damagedWashersCount = parseInt(document.getElementById('damagedWashersCount').value);
-            const halfWashersCount = parseInt(document.getElementById('halfWashersCount').value);
+            const washerDamageType =
+                damagedWashersCount > 0
+                    ? document.getElementById('washerDamageType').value === 'غير ذلك'
+                        ? document.getElementById('washerOther').querySelector('input').value
+                        : document.getElementById('washerDamageType').value
+                    : '';
+	    const halfWashersCount = parseInt(document.getElementById('halfWashersCount').value);
             const damagedHalfWashersCount = parseInt(document.getElementById('damagedHalfWashersCount').value);
-            const fridgesCount = parseInt(document.getElementById('fridgesCount').value);
+            const halfWasherDamageType =
+                damagedHalfWashersCount > 0
+                    ? document.getElementById('halfWasherDamageType').value === 'غير ذلك'
+                        ? document.getElementById('halfWasherOther').querySelector('input').value
+                        : document.getElementById('halfWasherDamageType').value
+                    : '';
+	    const fridgesCount = parseInt(document.getElementById('fridgesCount').value);
             const damagedFridgesCount = parseInt(document.getElementById('damagedFridgesCount').value);
-            
+            const fridgeDamageType =
+                damagedFridgesCount > 0
+                    ? document.getElementById('fridgeDamageType').value === 'غير ذلك'
+                        ? document.getElementById('fridgeOther').querySelector('input').value
+                        : document.getElementById('fridgeDamageType').value
+                    : '';
+
+	    // جمع إجابات محاولة الإصلاح
+            const stoveRepairAttempt = document.querySelector('input[name="stoveRepairAttempt"]:checked')?.value;
+            const washerRepairAttempt = document.querySelector('input[name="washerRepairAttempt"]:checked')?.value;
+            const halfWasherRepairAttempt = document.querySelector('input[name="halfWasherRepairAttempt"]:checked')?.value;
+            const fridgeRepairAttempt = document.querySelector('input[name="fridgeRepairAttempt"]:checked')?.value;
+
             // جمع الطلبات
             const requests = Array.from(document.querySelectorAll('input[name="requests"]:checked'))
                 .map(checkbox => {
@@ -1192,6 +1222,13 @@
             let additionalNotes = '';
             let marriedRules = '';
             
+	    // التحقق من وجود غسالة عاملة
+            const workingFullWashers = washersCount - damagedWashersCount;
+            const workingHalfWashers = halfWashersCount - damagedHalfWashersCount;
+            const hasWorkingWasher = workingFullWashers > 0 || workingHalfWashers > 0;
+            let washerConditionMet = true;
+            let washerConditionNote = '';
+
             // تطبيق القواعد الخاصة بالعروسة المكتوب كتابها
             const marriedRulesInfo = document.getElementById('marriedRulesInfo');
             const marriedRulesText = document.getElementById('marriedRulesText');
@@ -1204,6 +1241,11 @@
                 const hasWasherRequest = requests.some(r => r.value === 'غسالة');
                 const hasStoveRequest = requests.some(r => r.value === 'بوتجاز');
                 
+		// متغيرات خاصة بتقييم الثلاجة
+                let fridgeConditionMet = false;
+                let fridgeConditionNote = '';
+                let fridgeConditionDetails = '';
+
                 // تطبيق القواعد
                 if (hasStoveRequest && hasWasherRequest) {
                     neededDevices.push('بوتجاز');
@@ -1265,57 +1307,174 @@
                 } else {
                     switch (request) {
                         case 'سرير':
+                            // حساب عدد السراير المطلوبة بناءً على عدد الأفراد مقسومًا على 1.5
                             const requiredBeds = Math.ceil(familySize / 1.5);
                             const workingBeds = bedsCount - damagedBedsCount;
                             const neededBeds = Math.max(0, requiredBeds - workingBeds);
                             
-                            if (neededBeds > 0) {
+                            if (neededBeds > 0 && !addedDevices.has('سرير')) {
                                 neededDevices.push(`سرير (${neededBeds} عدد)`);
                                 addedDevices.add('سرير');
                             }
                             break;
-                            
+
                         case 'مرتبة':
+                            // حساب عدد المراتب المطلوبة بناءً على عدد الأفراد مقسومًا على 1.5
                             const requiredMattresses = Math.ceil(familySize / 1.5);
                             const workingMattresses = mattressesCount - damagedMattressesCount;
                             const neededMattresses = Math.max(0, requiredMattresses - workingMattresses);
                             
-                            if (neededMattresses > 0) {
+                            if (neededMattresses > 0 && !addedDevices.has('مرتبة')) {
                                 neededDevices.push(`مرتبة (${neededMattresses} عدد)`);
                                 addedDevices.add('مرتبة');
                             }
                             break;
-                            
+
                         case 'بوتجاز':
+                            // التحقق من محاولة الإصلاح للبوتجاز التالف
+                            if (damagedStovesCount > 0 && stoveRepairAttempt === 'no') {
+                                additionalNotes += "لم يتم إضافة بوتجاز بسبب وجود جهاز تالف لم تتم محاولة إصلاحه. ";
+                                break;
+                            }
+                            
+                            // التحقق من شروط البوتجاز للأسرة
+                            if (familyType === 'family') {
+                                if (familySize < 3) {
+                                    additionalNotes += "عذراً، طلب البوتجاز غير مؤهل لأن عدد أفراد الأسرة أقل من 3. ";
+                                    break;
+                                }
+                            }
+                            
+                            // التحقق من وجود بوتجاز عامل أو فرن
                             const hasWorkingStove = (stovesCount - damagedStovesCount) > 0;
-                            if (!hasWorkingStove && !hasOven) {
-                                neededDevices.push('بوتجاز');
-                                addedDevices.add('بوتجاز');
+                            if (hasWorkingStove) {
+                                additionalNotes += "لم يتم إضافة بوتجاز لأن الأسرة تملك بوتجازاً يعمل. ";
+                                break;
+                            }
+                            if (hasOven) {
+                                additionalNotes += "لم يتم إضافة بوتجاز لأن الأسرة تملك فرناً. ";
+                                break;
+                            }
+
+                            if (!addedDevices.has(request)) {
+                                neededDevices.push(request);
+                                addedDevices.add(request);
                             }
                             break;
-                            
+
                         case 'غسالة':
-                            const hasWorkingWasher = (washersCount - damagedWashersCount) > 0 || 
-                                                    (halfWashersCount - damagedHalfWashersCount) > 0;
-                            if (!hasWorkingWasher) {
-                                neededDevices.push('غسالة');
-                                addedDevices.add('غسالة');
+                            // الشرط: إذا كانت الأسرة لديها غسالة عاملة (عادية أو هاف)
+                            if (hasWorkingWasher) {
+                                additionalNotes += "لم يتم إضافة غسالة لأن الأسرة تمتلك غسالة عادية أو هاف تعمل. ";
+                                washerConditionMet = false;
+                                washerConditionNote = "تمتلك الأسرة غسالة عاملة";
+                                break;
+                            }
+                            
+                            // التحقق من محاولة الإصلاح للغسالة التالفة
+                            if (damagedWashersCount > 0 && washerRepairAttempt === 'no') {
+                                additionalNotes += "لم يتم إضافة غسالة بسبب وجود جهاز تالف لم تتم محاولة إصلاحه. ";
+                                washerConditionMet = false;
+                                washerConditionNote = "وجود غسالة تالفة لم تتم محاولة إصلاحها";
+                                break;
+                            }
+                            
+                            // التحقق من محاولة الإصلاح للغسالة الهاف التالفة
+                            if (damagedHalfWashersCount > 0 && halfWasherRepairAttempt === 'no') {
+                                additionalNotes += "لم يتم إضافة غسالة بسبب وجود غسالة هاف تالفة لم تتم محاولة إصلاحها. ";
+                                washerConditionMet = false;
+                                washerConditionNote = "وجود غسالة هاف تالفة لم تتم محاولة إصلاحها";
+                                break;
+                            }
+                            
+                            // تحديد نوع الغسالة
+                            let washerType = '';
+                            if (familySize === 2) {
+                                washerType = 'غسالة عادية';
+                            } else if (familySize >= 3) {
+                                washerType = 'غسالة هاف';
+                            } else if (familySize === 1 && hasElderly) {
+                                washerType = 'غسالة عادية (لشخص مسن)';
+                            }
+    
+                            // إضافة الغسالة المحددة
+                            if (washerType && !addedDevices.has(washerType)) {
+                                neededDevices.push(washerType);
+                                addedDevices.add(washerType);
                             }
                             break;
-                            
+
                         case 'ثلاجة':
+                            // تحديد شروط استحقاق الثلاجة
+                            fridgeConditionDetails = '';
+                            
+                            // الشرط 1: عدد الأسرة 7 أو أكثر
+                            const condition1 = familySize >= 7;
+                            
+                            // الشرط 2: وجود حالات طبية تتطلب ثلاجة
+                            const medicalConditions = familyType === 'family' ? 
+                                document.querySelector('input[name="medicalConditions"]:checked')?.value : 'no';
+                            const condition2 = medicalConditions === 'yes';
+                            
+                            // حالة الثلاجة الحالية
+                            const hasFridge = fridgesCount > 0;
                             const hasWorkingFridge = (fridgesCount - damagedFridgesCount) > 0;
-                            if (!hasWorkingFridge) {
-                                neededDevices.push('ثلاجة');
-                                addedDevices.add('ثلاجة');
+                            const hasDamagedFridge = damagedFridgesCount > 0;
+                            
+                            // هل تمت محاولة إصلاح الثلاجة التالفة؟
+                            const fridgeRepaired = fridgeRepairAttempt === 'yes';
+                            
+                            // تحقق من شروط استحقاق الثلاجة
+                            if (condition1 || condition2) {
+                                if (!hasFridge || (hasDamagedFridge && fridgeRepaired)) {
+                                    fridgeConditionMet = true;
+                                    if (!addedDevices.has(request)) {
+                                        neededDevices.push(request);
+                                        addedDevices.add(request);
+                                    }
+                                    
+                                    // بناء تفاصيل الشرط
+                                    fridgeConditionDetails += '<p>استحقاق الثلاجة بناءً على:</p><ul>';
+                                    if (condition1) {
+                                        fridgeConditionDetails += `<li>عدد الأسرة (${familySize}) 7 أو أكثر</li>`;
+                                    }
+                                    if (condition2) {
+                                        fridgeConditionDetails += '<li>وجود حالات طبية تتطلب ثلاجة</li>';
+                                    }
+                                    if (!hasFridge) {
+                                        fridgeConditionDetails += '<li>لا يوجد ثلاجة في المنزل</li>';
+                                    }
+                                    if (hasDamagedFridge && fridgeRepaired) {
+                                        fridgeConditionDetails += '<li>وجود ثلاجة تالفة وتمت محاولة إصلاحها</li>';
+                                    }
+                                    fridgeConditionDetails += '</ul>';
+                                } else {
+                                    fridgeConditionDetails += '<p>الأسرة تمتلك ثلاجة عاملة ولا تحتاج إلى ثلاجة جديدة</p>';
+                                }
+                            } else {
+                                fridgeConditionDetails += '<p>لا تنطبق شروط استحقاق الثلاجة:</p><ul>';
+                                if (familySize < 7) {
+                                    fridgeConditionDetails += `<li>عدد الأسرة (${familySize}) أقل من 7</li>`;
+                                }
+                                if (medicalConditions !== 'yes') {
+                                    fridgeConditionDetails += '<li>لا توجد حالات طبية تتطلب ثلاجة</li>';
+                                }
+                                if (hasFridge && !hasDamagedFridge) {
+                                    fridgeConditionDetails += '<li>الأسرة تمتلك ثلاجة عاملة</li>';
+                                }
+                                if (hasDamagedFridge && !fridgeRepaired) {
+                                    fridgeConditionDetails += '<li>الأسرة تمتلك ثلاجة تالفة ولم تتم محاولة إصلاحها</li>';
+                                }
+                                fridgeConditionDetails += '</ul>';
                             }
                             break;
-                            
+
                         default:
                             if (!addedDevices.has(request)) {
                                 neededDevices.push(request);
                                 addedDevices.add(request);
                             }
+                            break;
                     }
                 }
             });
@@ -1349,6 +1508,7 @@
             const progressBar = document.getElementById('progressBar');
             const washerConditionDiv = document.getElementById('washerCondition');
             const fridgeConditionDiv = document.getElementById('fridgeCondition');
+	    const bedConditionDiv = document.getElementById('bedCondition');
 
             ratingBadge.className = `rating-badge ${rating}`;
             ratingBadge.textContent = rating;
@@ -1356,6 +1516,16 @@
             ratingCircle.querySelector('.letter').textContent = rating;
             ratingCircle.querySelector('.text').textContent = ratingText;
             progressBar.style.width = `${progressWidth}%`;
+
+	    // حساب عدد السراير والمراتب المطلوبة لعرضها في قسم الحساب
+            const requiredBeds = Math.ceil(familySize / 1.5);
+            const workingBeds = bedsCount - damagedBedsCount;
+            const neededBeds = Math.max(0, requiredBeds - workingBeds);
+            
+            const requiredMattresses = Math.ceil(familySize / 1.5);
+            const workingMattresses = mattressesCount - damagedMattressesCount;
+            const neededMattresses = Math.max(0, requiredMattresses - workingMattresses);
+            
 
             // تحديث حالة شرط الغسالة
             if (document.getElementById('requestWasher').checked) {
@@ -1378,6 +1548,14 @@
                         <p><strong>عدد الأسرة:</strong> ${familySize}</p>
                     `;
                 }
+            } 
+
+	    if (!washerConditionMet) {
+                    washerConditionDiv.className = 'condition-box not-met';
+                    washerConditionDiv.querySelector('.condition-desc').innerHTML += `<p><strong>سبب عدم الاستحقاق:</strong> ${washerConditionNote}</p>`;
+                } else {
+                    washerConditionDiv.className = 'condition-box';
+                }
             } else {
                 washerConditionDiv.style.display = 'none';
             }
@@ -1385,14 +1563,13 @@
             // تحديث حالة شرط الثلاجة
             if (document.getElementById('requestFridge').checked) {
                 fridgeConditionDiv.style.display = 'block';
-                fridgeConditionDiv.querySelector('.condition-desc').innerHTML = `
-                    <p>شروط استحقاق الثلاجة:</p>
-                    <ul>
-                        <li>وجود حالات طبية تتطلب ثلاجة</li>
-                        <li>عدد أفراد الأسرة 7 أو أكثر</li>
-                        <li>عدم وجود ثلاجة عاملة في المنزل</li>
-                    </ul>
-                `;
+                fridgeConditionDiv.querySelector('.condition-desc').innerHTML = fridgeConditionDetails;
+                
+                if (fridgeConditionMet) {
+                    fridgeConditionDiv.className = 'fridge-condition';
+                } else {
+                    fridgeConditionDiv.className = 'fridge-condition not-met';
+                }
             } else {
                 fridgeConditionDiv.style.display = 'none';
             }
