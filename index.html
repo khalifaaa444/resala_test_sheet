@@ -1344,12 +1344,7 @@
             let washerConditionNote = '';
 
             // إضافة دعم مالي للعروسة إذا لم يكن لها عائل
-            if ((familyType === 'engaged' || familyType === 'married') && !hasProvider) {
-                if (!addedDevices.has('الدعم المالي')) {
-                    neededDevices.push('الدعم المالي');
-                    addedDevices.add('الدعم المالي');
-                }
-            }
+            
 
             // متغيرات خاصة بتقييم الثلاجة
             let fridgeConditionMet = false;
