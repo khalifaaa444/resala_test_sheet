@@ -521,7 +521,7 @@
             z-index: 1;
         }
         
-        .washer-condition {
+        .condition-box {
             background-color: #e9f7ef;
             border-radius: var(--border-radius);
             padding: 15px;
@@ -529,7 +529,7 @@
             border-left: 4px solid #28a745;
         }
         
-        .washer-condition.not-met {
+        .condition-box.not-met {
             background-color: #fbeaea;
             border-left: 4px solid #dc3545;
         }
@@ -565,6 +565,19 @@
         
         .calculation-desc {
             font-size: 0.95rem;
+        }
+        
+        .fridge-condition {
+            background-color: #e6f7ff;
+            border-radius: var(--border-radius);
+            padding: 15px;
+            margin-top: 15px;
+            border-left: 4px solid #4cc9f0;
+        }
+        
+        .fridge-condition.not-met {
+            background-color: #fbeaea;
+            border-left: 4px solid #dc3545;
         }
 
         @keyframes fadeIn {
@@ -988,12 +1001,20 @@
                     <span>أكثر احتياج</span>
                 </div>
                 
-                <div id="washerCondition" class="washer-condition">
+                <div id="washerCondition" class="condition-box">
                     <div class="condition-title">
                         <i class="fas fa-washing-machine"></i>
                         <span>شروط الحصول على غسالة</span>
                     </div>
                     <div id="washerConditionText" class="condition-desc"></div>
+                </div>
+                
+                <div id="fridgeCondition" class="fridge-condition">
+                    <div class="condition-title">
+                        <i class="fas fa-snowflake"></i>
+                        <span>شروط الحصول على ثلاجة</span>
+                    </div>
+                    <div id="fridgeConditionText" class="condition-desc"></div>
                 </div>
                 
                 
@@ -1211,6 +1232,11 @@
                 }
             }
 
+            // متغيرات خاصة بتقييم الثلاجة
+            let fridgeConditionMet = false;
+            let fridgeConditionNote = '';
+            let fridgeConditionDetails = '';
+            
             // معالجة الطلبات
             requests.forEach(requestObj => {
                 const request = requestObj.value;
@@ -1322,16 +1348,67 @@
                             break;
 
                         case 'ثلاجة':
-                            // التحقق من محاولة الإصلاح للثلاجة التالفة
-                            if (damagedFridgesCount > 0 && fridgeRepairAttempt === 'no') {
-                                additionalNotes += "لم يتم إضافة ثلاجة بسبب وجود جهاز تالف لم تتم محاولة إصلاحه. ";
-                                break;
-                            }
+                            // تحديد شروط استحقاق الثلاجة
+                            fridgeConditionDetails = '';
                             
-                            // إضافة الثلاجة إذا لم تكن مضافة
-                            if (!addedDevices.has(request)) {
-                                neededDevices.push(request);
-                                addedDevices.add(request);
+                            // الشرط 1: عدد الأسرة 7 أو أكثر
+                            const condition1 = familySize >= 7;
+                            
+                            // الشرط 2: وجود حالات طبية تتطلب ثلاجة
+                            const medicalConditions = familyType === 'family' ? 
+                                document.querySelector('input[name="medicalConditions"]:checked')?.value : 'no';
+                            const condition2 = medicalConditions === 'yes';
+                            
+                            // حالة الثلاجة الحالية
+                            const hasFridge = fridgesCount > 0;
+                            const hasWorkingFridge = (fridgesCount - damagedFridgesCount) > 0;
+                            const hasDamagedFridge = damagedFridgesCount > 0;
+                            
+                            // هل تمت محاولة إصلاح الثلاجة التالفة؟
+                            const fridgeRepaired = fridgeRepairAttempt === 'yes';
+                            
+                            // تحقق من شروط استحقاق الثلاجة
+                            if (condition1 || condition2) {
+                                if (!hasFridge || (hasDamagedFridge && fridgeRepaired)) {
+                                    fridgeConditionMet = true;
+                                    if (!addedDevices.has(request)) {
+                                        neededDevices.push(request);
+                                        addedDevices.add(request);
+                                    }
+                                    
+                                    // بناء تفاصيل الشرط
+                                    fridgeConditionDetails += '<p>استحقاق الثلاجة بناءً على:</p><ul>';
+                                    if (condition1) {
+                                        fridgeConditionDetails += `<li>عدد الأسرة (${familySize}) 7 أو أكثر</li>`;
+                                    }
+                                    if (condition2) {
+                                        fridgeConditionDetails += '<li>وجود حالات طبية تتطلب ثلاجة</li>';
+                                    }
+                                    if (!hasFridge) {
+                                        fridgeConditionDetails += '<li>لا يوجد ثلاجة في المنزل</li>';
+                                    }
+                                    if (hasDamagedFridge && fridgeRepaired) {
+                                        fridgeConditionDetails += '<li>وجود ثلاجة تالفة وتمت محاولة إصلاحها</li>';
+                                    }
+                                    fridgeConditionDetails += '</ul>';
+                                } else {
+                                    fridgeConditionDetails += '<p>الأسرة تمتلك ثلاجة عاملة ولا تحتاج إلى ثلاجة جديدة</p>';
+                                }
+                            } else {
+                                fridgeConditionDetails += '<p>لا تنطبق شروط استحقاق الثلاجة:</p><ul>';
+                                if (familySize < 7) {
+                                    fridgeConditionDetails += `<li>عدد الأسرة (${familySize}) أقل من 7</li>`;
+                                }
+                                if (medicalConditions !== 'yes') {
+                                    fridgeConditionDetails += '<li>لا توجد حالات طبية تتطلب ثلاجة</li>';
+                                }
+                                if (hasFridge && !hasDamagedFridge) {
+                                    fridgeConditionDetails += '<li>الأسرة تمتلك ثلاجة عاملة</li>';
+                                }
+                                if (hasDamagedFridge && !fridgeRepaired) {
+                                    fridgeConditionDetails += '<li>الأسرة تمتلك ثلاجة تالفة ولم تتم محاولة إصلاحها</li>';
+                                }
+                                fridgeConditionDetails += '</ul>';
                             }
                             break;
 
@@ -1373,6 +1450,7 @@
             const ratingCircle = document.getElementById('ratingCircle');
             const progressBar = document.getElementById('progressBar');
             const washerConditionDiv = document.getElementById('washerCondition');
+            const fridgeConditionDiv = document.getElementById('fridgeCondition');
             const bedConditionDiv = document.getElementById('bedCondition');
 
             ratingBadge.className = `rating-badge ${rating}`;
@@ -1398,31 +1476,45 @@
                 washerConditionDiv.style.display = 'block';
     
                 if (familySize === 1) {
-                    washerConditionText.innerHTML = `
+                    washerConditionDiv.querySelector('.condition-desc').innerHTML = `
                         <p>لا تستحق الأسرة غسالة إلا إذا كان الفرد مسنًا</p>
                         <p><strong>عدد الأفراد:</strong> ${familySize}</p>
                         <p><strong>هل يوجد مسن؟</strong> ${hasElderly ? 'نعم' : 'لا'}</p>
                     `;
                 } else if (familySize === 2) {
-                    washerConditionText.innerHTML = `
+                    washerConditionDiv.querySelector('.condition-desc').innerHTML = `
                         <p>تستحق الأسرة غسالة عادية لأن عدد الأسرة 2</p>
                         <p><strong>عدد الأسرة:</strong> ${familySize}</p>
                     `;
                 } else if (familySize >= 3) {
-                    washerConditionText.innerHTML = `
+                    washerConditionDiv.querySelector('.condition-desc').innerHTML = `
                         <p>تستحق الأسرة غسالة هاف لأن عدد الأسرة 3 أو أكثر</p>
                         <p><strong>عدد الأسرة:</strong> ${familySize}</p>
                     `;
                 }
     
                 if (!washerConditionMet) {
-                    washerConditionDiv.className = 'washer-condition not-met';
-                    washerConditionText.innerHTML += `<p><strong>سبب عدم الاستحقاق:</strong> ${washerConditionNote}</p>`;
+                    washerConditionDiv.className = 'condition-box not-met';
+                    washerConditionDiv.querySelector('.condition-desc').innerHTML += `<p><strong>سبب عدم الاستحقاق:</strong> ${washerConditionNote}</p>`;
                 } else {
-                    washerConditionDiv.className = 'washer-condition';
+                    washerConditionDiv.className = 'condition-box';
                 }
             } else {
                 washerConditionDiv.style.display = 'none';
+            }
+            
+            // تحديث حالة شرط الثلاجة
+            if (document.getElementById('requestFridge').checked) {
+                fridgeConditionDiv.style.display = 'block';
+                fridgeConditionDiv.querySelector('.condition-desc').innerHTML = fridgeConditionDetails;
+                
+                if (fridgeConditionMet) {
+                    fridgeConditionDiv.className = 'fridge-condition';
+                } else {
+                    fridgeConditionDiv.className = 'fridge-condition not-met';
+                }
+            } else {
+                fridgeConditionDiv.style.display = 'none';
             }
 
             let purchasedItemsHTML = '';
