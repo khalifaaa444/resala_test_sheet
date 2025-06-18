@@ -579,6 +579,14 @@
             background-color: #fbeaea;
             border-left: 4px solid #dc3545;
         }
+ 
+.bride-info {
+            background-color: #f5f0ff;
+            border-radius: var(--border-radius);
+            padding: 15px;
+            margin-top: 15px;
+            border-left: 4px solid #8a2be2;
+        }
 
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(10px); }
@@ -665,6 +673,20 @@
                     <div class="form-group">
                         <label for="familySize" class="required">عدد أفراد الأسرة:</label>
                         <input type="number" id="familySize" min="1" required placeholder="أدخل عدد الأفراد">
+                    </div>
+ 			
+		     <div id="blanketGroup" class="form-group" style="display: none;">
+                        <label>هل تمتلك العروسة لحاف؟</label>
+                        <div class="radio-group">
+                            <div class="radio-item">
+                                <input type="radio" name="hasBlanket" value="yes" id="blanketYes">
+                                <label for="blanketYes">نعم</label>
+                            </div>
+                            <div class="radio-item">
+                                <input type="radio" name="hasBlanket" value="no" id="blanketNo" checked>
+                                <label for="blanketNo">لا</label>
+                            </div>
+                        </div>
                     </div>
                     
                     <div id="elderlyGroup" class="form-group" style="display:none;">
@@ -986,6 +1008,13 @@
                     </div>
                 </div>
                 
+				<div id="brideInfo" class="bride-info" style="display: none;">
+                    <div class="condition-title">
+                        <i class="fas fa-user-circle"></i>
+                        <span>معلومات خاصة بالعروسة</span>
+                    </div>
+                    <div id="brideInfoText" class="condition-desc"></div>
+                </div>
                 <div class="visual-rating">
                     <div id="ratingCircle" class="rating-circle A">
                         <div class="letter">A</div>
@@ -1029,6 +1058,7 @@
         document.getElementById('familyType').addEventListener('change', function() {
             const familyType = this.value;
             const providerGroup = document.getElementById('providerGroup');
+			const blanketGroup = document.getElementById('blanketGroup');
             const purchasedItemsGroup = document.getElementById('purchasedItemsGroup');
             const medicalConditionsGroup = document.getElementById('medicalConditionsGroup');
             const smallApartmentGroup = document.getElementById('smallApartmentGroup');
@@ -1037,17 +1067,22 @@
             // إظهار حقل العائل وما تم شراؤه للعروسة فقط
             if (familyType === 'engaged' || familyType === 'married') {
                 providerGroup.style.display = 'block';
+                blanketGroup.style.display = 'block';
                 purchasedItemsGroup.style.display = 'block';
-            } else {
+                medicalConditionsGroup.style.display = 'none';
+                smallApartmentGroup.style.display = 'none';
+                elderlyGroup.style.display = 'none';
+            } else if (familyType === 'family') {
                 providerGroup.style.display = 'none';
+                blanketGroup.style.display = 'none';
                 purchasedItemsGroup.style.display = 'none';
-            }
-            
-            if (familyType === 'family') {
                 medicalConditionsGroup.style.display = 'block';
                 smallApartmentGroup.style.display = 'block';
                 elderlyGroup.style.display = 'block';
             } else {
+                providerGroup.style.display = 'none';
+                blanketGroup.style.display = 'none';
+                purchasedItemsGroup.style.display = 'none';
                 medicalConditionsGroup.style.display = 'none';
                 smallApartmentGroup.style.display = 'none';
                 elderlyGroup.style.display = 'none';
@@ -1147,10 +1182,13 @@
             const familyType = document.getElementById('familyType').value;
             const familyName = document.getElementById('familyName').value;
             const familySize = parseInt(document.getElementById('familySize').value);
+			const hasProvider = document.querySelector('input[name="hasProvider"]:checked')?.value === 'yes';
+			const hasBlanket = document.querySelector('input[name="hasBlanket"]:checked')?.value === 'yes';
             const income = parseFloat(document.getElementById('income').value);
             const expenses = parseFloat(document.getElementById('expenses').value);
             const hasElderly = document.querySelector('input[name="hasElderly"]:checked')?.value === 'yes';
-
+			const purchasedItems = document.getElementById('purchasedItems').value;
+			
             // جمع بيانات الأجهزة
             const bedsCount = parseInt(document.getElementById('bedsCount').value);
             const damagedBedsCount = parseInt(document.getElementById('damagedBedsCount').value);
@@ -1212,6 +1250,106 @@
             const neededDevices = [];
             const addedDevices = new Set();
             let additionalNotes = '';
+            let brideInfo = '';
+             // إضافة اللحاف إذا لم تمتلكه العروسة
+            if ((familyType === 'engaged' || familyType === 'married') && !hasBlanket) {
+                neededDevices.push('لحاف');
+                addedDevices.add('لحاف');
+                additionalNotes += "تمت إضافة اللحاف لأن العروسة لا تمتلكه.<br>";
+            }
+
+            // معالجة حالة العروسة المكتوب كتابها
+            if (familyType === 'married') {
+                brideInfo = "<strong>حالة العروسة المكتوب كتابها</strong><br>";
+                
+                // حالة: طلبت بوتجاز وغسالة
+                if (requests.includes('بوتجاز') && requests.includes('غسالة')) {
+                    neededDevices.push('بوتجاز');
+                    neededDevices.push('غسالة هاف');
+                    addedDevices.add('بوتجاز');
+                    addedDevices.add('غسالة هاف');
+                    brideInfo += "تمت إضافة البوتجاز وغسالة هاف كما طلبت العروسة.<br>";
+                }
+                // حالة: طلبت ثلاجة فقط
+                else if (requests.includes('ثلاجة') && requests.length === 1) {
+                    neededDevices.push('ثلاجة');
+                    addedDevices.add('ثلاجة');
+                    brideInfo += "تمت إضافة الثلاجة كما طلبت العروسة.<br>";
+                }
+                // حالة: طلبت ثلاجة وجهاز آخر (غسالة أو بوتجاز) ولا يوجد عائل
+                else if (requests.includes('ثلاجة') && 
+                         (requests.includes('غسالة') || requests.includes('بوتجاز')) && 
+                         !hasProvider) {
+                    neededDevices.push('ثلاجة');
+                    addedDevices.add('ثلاجة');
+                    
+                    if (requests.includes('غسالة')) {
+                        neededDevices.push('غسالة هاف');
+                        addedDevices.add('غسالة هاف');
+                        brideInfo += "تمت إضافة الثلاجة وغسالة هاف.<br>";
+                    }
+                    if (requests.includes('بوتجاز')) {
+                        neededDevices.push('بوتجاز');
+                        addedDevices.add('بوتجاز');
+                        brideInfo += "تمت إضافة الثلاجة والبوتجاز.<br>";
+                    }
+                }
+                // حالة: طلبت 3 أجهزة (ثلاجة، غسالة، بوتجاز)
+                else if (requests.includes('ثلاجة') && requests.includes('غسالة') && requests.includes('بوتجاز')) {
+                    neededDevices.push('بوتجاز');
+                    neededDevices.push('غسالة هاف');
+                    addedDevices.add('بوتجاز');
+                    addedDevices.add('غسالة هاف');
+                    brideInfo += "تمت إضافة البوتجاز وغسالة هاف فقط.<br>";
+                } else {
+                    brideInfo += "طلبات العروسة لا تتوافق مع الشروط المحددة.<br>";
+                }
+            }
+            
+            // معالجة حالة العروسة المخطوبة
+            else if (familyType === 'engaged') {
+                brideInfo = "<strong>حالة العروسة المخطوبة</strong><br>";
+                
+                // حالة: طلبت 3 أجهزة
+                if (requests.includes('ثلاجة') && requests.includes('غسالة') && requests.includes('بوتجاز')) {
+                    // اختيار عشوائي بين الغسالة أو البوتجاز
+                    const choices = ['غسالة', 'بوتجاز'];
+                    const randomChoice = choices[Math.floor(Math.random() * choices.length)];
+                    neededDevices.push(randomChoice);
+                    addedDevices.add(randomChoice);
+                    brideInfo += `تم اختيار ${randomChoice} عشوائياً من بين الغسالة والبوتجاز.<br>`;
+                }
+                // حالة: طلبت ثلاجة فقط - لا تتم الموافقة
+                else if (requests.includes('ثلاجة') && requests.length === 1) {
+                    brideInfo += "لم تتم إضافة الثلاجة لأن طلب الثلاجة فقط غير مقبول.<br>";
+                }
+                // حالة: طلبت غسالة فقط أو بوتجاز فقط
+                else if ((requests.includes('غسالة') && requests.length === 1) || 
+                         (requests.includes('بوتجاز') && requests.length === 1)) {
+                    if (requests.includes('غسالة')) {
+                        neededDevices.push('غسالة');
+                        addedDevices.add('غسالة');
+                        brideInfo += "تمت إضافة الغسالة كما طلبت العروسة.<br>";
+                    }
+                    if (requests.includes('بوتجاز')) {
+                        neededDevices.push('بوتجاز');
+                        addedDevices.add('بوتجاز');
+                        brideInfo += "تمت إضافة البوتجاز كما طلبت العروسة.<br>";
+                    }
+                }
+                // حالة: طلبت بوتجاز وغسالة
+                else if (requests.includes('غسالة') && requests.includes('بوتجاز')) {
+                    // اختيار عشوائي بينهما
+                    const choices = ['غسالة', 'بوتجاز'];
+                    const randomChoice = choices[Math.floor(Math.random() * choices.length)];
+                    neededDevices.push(randomChoice);
+                    addedDevices.add(randomChoice);
+                    brideInfo += `تم اختيار ${randomChoice} عشوائياً من بين الغسالة والبوتجاز.<br>`;
+                } else {
+                    brideInfo += "طلبات العروسة لا تتوافق مع الشروط المحددة.<br>";
+                }
+            }
+
             
             // التحقق من وجود غسالة عاملة
             const workingFullWashers = washersCount - damagedWashersCount;
@@ -1224,13 +1362,7 @@
             const hasProvider = document.querySelector('input[name="hasProvider"]:checked')?.value === 'yes';
             const purchasedItems = document.getElementById('purchasedItems').value;
 
-            // إضافة دعم مالي للعروسة إذا لم يكن لها عائل
-            if ((familyType === 'engaged' || familyType === 'married') && !hasProvider) {
-                if (!addedDevices.has('الدعم المالي')) {
-                    neededDevices.push('الدعم المالي');
-                    addedDevices.add('الدعم المالي');
-                }
-            }
+      
 
             // متغيرات خاصة بتقييم الثلاجة
             let fridgeConditionMet = false;
