@@ -625,7 +625,7 @@
     <div class="container">
         <header>
             <h1><i class="fas fa-hand-holding-heart"></i> نظام تقييم استحقاق الأسر للمساعدات</h1>
-            <p>نظام قائم لتقييم الحالات الخاصة بنشاط المساعدات مع التركيز على العروسة المكتوب كتابها</p>
+            <p>نظام قائم لتقييم الحالات الخاصة بنشاط المساعدات</p>
         </header>
         
         <div class="form-content">
@@ -1001,14 +1001,6 @@
                     <span>أكثر احتياج</span>
                 </div>
                 
-                <div id="marriedRulesInfo" class="calculation-info" style="display: none;">
-                    <div class="calculation-title">
-                        <i class="fas fa-ring"></i>
-                        <span>قواعد خاصة بالعروسة المكتوب كتابها</span>
-                    </div>
-                    <div id="marriedRulesText" class="calculation-desc"></div>
-                </div>
-                
                 <div id="washerCondition" class="condition-box">
                     <div class="condition-title">
                         <i class="fas fa-washing-machine"></i>
@@ -1024,6 +1016,8 @@
                     </div>
                     <div id="fridgeConditionText" class="condition-desc"></div>
                 </div>
+                
+                
                 
                 <div id="devicesNeeded" class="devices-list"></div>
             </div>
@@ -1156,8 +1150,6 @@
             const income = parseFloat(document.getElementById('income').value);
             const expenses = parseFloat(document.getElementById('expenses').value);
             const hasElderly = document.querySelector('input[name="hasElderly"]:checked')?.value === 'yes';
-            const hasProvider = document.querySelector('input[name="hasProvider"]:checked')?.value === 'yes';
-            const purchasedItems = document.getElementById('purchasedItems').value;
 
             // جمع بيانات الأجهزة
             const bedsCount = parseInt(document.getElementById('bedsCount').value);
@@ -1167,12 +1159,12 @@
             const stovesCount = parseInt(document.getElementById('stovesCount').value);
             const damagedStovesCount = parseInt(document.getElementById('damagedStovesCount').value);
             const stoveDamageType =
-            	damagedStovesCount > 0
+                damagedStovesCount > 0
                     ? document.getElementById('stoveDamageType').value === 'غير ذلك'
                         ? document.getElementById('stoveOther').querySelector('input').value
                         : document.getElementById('stoveDamageType').value
                     : '';
-	    const hasOven = document.getElementById('hasOven').checked;
+            const hasOven = document.getElementById('hasOven').checked;
             const washersCount = parseInt(document.getElementById('washersCount').value);
             const damagedWashersCount = parseInt(document.getElementById('damagedWashersCount').value);
             const washerDamageType =
@@ -1181,7 +1173,7 @@
                         ? document.getElementById('washerOther').querySelector('input').value
                         : document.getElementById('washerDamageType').value
                     : '';
-	    const halfWashersCount = parseInt(document.getElementById('halfWashersCount').value);
+            const halfWashersCount = parseInt(document.getElementById('halfWashersCount').value);
             const damagedHalfWashersCount = parseInt(document.getElementById('damagedHalfWashersCount').value);
             const halfWasherDamageType =
                 damagedHalfWashersCount > 0
@@ -1189,7 +1181,7 @@
                         ? document.getElementById('halfWasherOther').querySelector('input').value
                         : document.getElementById('halfWasherDamageType').value
                     : '';
-	    const fridgesCount = parseInt(document.getElementById('fridgesCount').value);
+            const fridgesCount = parseInt(document.getElementById('fridgesCount').value);
             const damagedFridgesCount = parseInt(document.getElementById('damagedFridgesCount').value);
             const fridgeDamageType =
                 damagedFridgesCount > 0
@@ -1197,14 +1189,14 @@
                         ? document.getElementById('fridgeOther').querySelector('input').value
                         : document.getElementById('fridgeDamageType').value
                     : '';
-
-	    // جمع إجابات محاولة الإصلاح
+            
+            // جمع إجابات محاولة الإصلاح
             const stoveRepairAttempt = document.querySelector('input[name="stoveRepairAttempt"]:checked')?.value;
             const washerRepairAttempt = document.querySelector('input[name="washerRepairAttempt"]:checked')?.value;
             const halfWasherRepairAttempt = document.querySelector('input[name="halfWasherRepairAttempt"]:checked')?.value;
             const fridgeRepairAttempt = document.querySelector('input[name="fridgeRepairAttempt"]:checked')?.value;
-
-            // جمع الطلبات
+            
+            // جمع الطلبات مع العلم أنها قد تكون مخصصة
             const requests = Array.from(document.querySelectorAll('input[name="requests"]:checked'))
                 .map(checkbox => {
                     if (checkbox.value === 'غير ذلك') {
@@ -1214,96 +1206,47 @@
                         return { value: checkbox.value, isCustom: false };
                     }
                 })
-                .filter(request => request.value !== '');
+                .filter(request => request.value !== ''); // تجاهل الطلبات الفارغة
 
             // تحديد الأجهزة المطلوبة
             const neededDevices = [];
             const addedDevices = new Set();
             let additionalNotes = '';
-            let marriedRules = '';
             
-	    // التحقق من وجود غسالة عاملة
+            // التحقق من وجود غسالة عاملة
             const workingFullWashers = washersCount - damagedWashersCount;
             const workingHalfWashers = halfWashersCount - damagedHalfWashersCount;
             const hasWorkingWasher = workingFullWashers > 0 || workingHalfWashers > 0;
             let washerConditionMet = true;
             let washerConditionNote = '';
 
-            // تطبيق القواعد الخاصة بالعروسة المكتوب كتابها
-            const marriedRulesInfo = document.getElementById('marriedRulesInfo');
-            const marriedRulesText = document.getElementById('marriedRulesText');
-            
-            if (familyType === 'married') {
-                marriedRulesInfo.style.display = 'block';
-                
-                // استخراج الطلبات الخاصة بالأجهزة الأساسية
-                const hasFridgeRequest = requests.some(r => r.value === 'ثلاجة');
-                const hasWasherRequest = requests.some(r => r.value === 'غسالة');
-                const hasStoveRequest = requests.some(r => r.value === 'بوتجاز');
-                
-		// متغيرات خاصة بتقييم الثلاجة
-                let fridgeConditionMet = false;
-                let fridgeConditionNote = '';
-                let fridgeConditionDetails = '';
+            // التحقق من وجود عائل للعروسة
+            const hasProvider = document.querySelector('input[name="hasProvider"]:checked')?.value === 'yes';
+            const purchasedItems = document.getElementById('purchasedItems').value;
 
-                // تطبيق القواعد
-                if (hasStoveRequest && hasWasherRequest) {
-                    neededDevices.push('بوتجاز');
-                    neededDevices.push('غسالة هاف');
-                    addedDevices.add('بوتجاز');
-                    addedDevices.add('غسالة هاف');
-                    marriedRules += '<p>الطلبات: بوتجاز وغسالة هاف → تمت الموافقة على كليهما</p>';
+            // إضافة دعم مالي للعروسة إذا لم يكن لها عائل
+            if ((familyType === 'engaged' || familyType === 'married') && !hasProvider) {
+                if (!addedDevices.has('الدعم المالي')) {
+                    neededDevices.push('الدعم المالي');
+                    addedDevices.add('الدعم المالي');
                 }
-                else if (hasStoveRequest) {
-                    neededDevices.push('بوتجاز');
-                    addedDevices.add('بوتجاز');
-                    marriedRules += '<p>الطلبات: بوتجاز فقط → تمت الموافقة عليه</p>';
-                }
-                else if (hasWasherRequest) {
-                    neededDevices.push('غسالة هاف');
-                    addedDevices.add('غسالة هاف');
-                    marriedRules += '<p>الطلبات: غسالة فقط → تمت الموافقة على غسالة هاف</p>';
-                }
-                
-                if (hasFridgeRequest && !hasProvider) {
-                    if (requests.filter(r => r.value === 'ثلاجة').length === 1) {
-                        neededDevices.push('ثلاجة');
-                        addedDevices.add('ثلاجة');
-                        marriedRules += '<p>الطلبات: ثلاجة فقط ولا يوجد عائل → تمت الموافقة على الثلاجة</p>';
-                    } else if ((hasStoveRequest || hasWasherRequest) && !hasProvider) {
-                        neededDevices.push('ثلاجة');
-                        addedDevices.add('ثلاجة');
-                        marriedRules += '<p>الطلبات: ثلاجة وأجهزة أخرى ولا يوجد عائل → تمت الموافقة على الثلاجة والأجهزة الأخرى</p>';
-                    }
-                }
-                
-                if (hasFridgeRequest && hasStoveRequest && hasWasherRequest) {
-                    // إزالة الثلاجة إذا تمت إضافتها في الخطوة السابقة
-                    neededDevices.splice(neededDevices.indexOf('ثلاجة'), 1);
-                    addedDevices.delete('ثلاجة');
-                    marriedRules += '<p>الطلبات: بوتجاز وغسالة هاف وثلاجة → تمت الموافقة على بوتجاز وغسالة هاف فقط</p>';
-                }
-                
-                // إضافة ملاحظة إذا طلبت الثلاجة ولكن يوجد عائل
-                if (hasFridgeRequest && hasProvider) {
-                    marriedRules += '<p>الطلبات: ثلاجة مع وجود عائل → لم تتم الموافقة على الثلاجة</p>';
-                }
-            } else {
-                marriedRulesInfo.style.display = 'none';
             }
+
+            // متغيرات خاصة بتقييم الثلاجة
+            let fridgeConditionMet = false;
+            let fridgeConditionNote = '';
+            let fridgeConditionDetails = '';
             
-            marriedRulesText.innerHTML = marriedRules;
-            
-            // معالجة الطلبات الأخرى للأنواع الأخرى من الأسر
+            // معالجة الطلبات
             requests.forEach(requestObj => {
                 const request = requestObj.value;
                 const isCustom = requestObj.isCustom;
-                
-                if (addedDevices.has(request)) return;
-                
+
                 if (isCustom) {
-                    neededDevices.push(request);
-                    addedDevices.add(request);
+                    if (!addedDevices.has(request)) {
+                        neededDevices.push(request);
+                        addedDevices.add(request);
+                    }
                 } else {
                     switch (request) {
                         case 'سرير':
@@ -1508,7 +1451,7 @@
             const progressBar = document.getElementById('progressBar');
             const washerConditionDiv = document.getElementById('washerCondition');
             const fridgeConditionDiv = document.getElementById('fridgeCondition');
-	    const bedConditionDiv = document.getElementById('bedCondition');
+            const bedConditionDiv = document.getElementById('bedCondition');
 
             ratingBadge.className = `rating-badge ${rating}`;
             ratingBadge.textContent = rating;
@@ -1517,7 +1460,7 @@
             ratingCircle.querySelector('.text').textContent = ratingText;
             progressBar.style.width = `${progressWidth}%`;
 
-	    // حساب عدد السراير والمراتب المطلوبة لعرضها في قسم الحساب
+            // حساب عدد السراير والمراتب المطلوبة لعرضها في قسم الحساب
             const requiredBeds = Math.ceil(familySize / 1.5);
             const workingBeds = bedsCount - damagedBedsCount;
             const neededBeds = Math.max(0, requiredBeds - workingBeds);
@@ -1525,6 +1468,7 @@
             const requiredMattresses = Math.ceil(familySize / 1.5);
             const workingMattresses = mattressesCount - damagedMattressesCount;
             const neededMattresses = Math.max(0, requiredMattresses - workingMattresses);
+            
             
 
             // تحديث حالة شرط الغسالة
@@ -1548,9 +1492,8 @@
                         <p><strong>عدد الأسرة:</strong> ${familySize}</p>
                     `;
                 }
-            } 
-
-	    if (!washerConditionMet) {
+    
+                if (!washerConditionMet) {
                     washerConditionDiv.className = 'condition-box not-met';
                     washerConditionDiv.querySelector('.condition-desc').innerHTML += `<p><strong>سبب عدم الاستحقاق:</strong> ${washerConditionNote}</p>`;
                 } else {
