@@ -1251,7 +1251,7 @@
                     switch (request) {
                         case 'سرير':
                             // حساب عدد السراير المطلوبة بناءً على عدد الأفراد مقسومًا على 1.5
-                            const requiredBeds = Math.ceil(familySize / 1.5);
+                            const requiredBeds = Math.ceil(familySize / 2);
                             const workingBeds = bedsCount - damagedBedsCount;
                             const neededBeds = Math.max(0, requiredBeds - workingBeds);
                             
@@ -1263,7 +1263,7 @@
 
                         case 'مرتبة':
                             // حساب عدد المراتب المطلوبة بناءً على عدد الأفراد مقسومًا على 1.5
-                            const requiredMattresses = Math.ceil(familySize / 1.5);
+                            const requiredMattresses = Math.ceil(familySize / 2);
                             const workingMattresses = mattressesCount - damagedMattressesCount;
                             const neededMattresses = Math.max(0, requiredMattresses - workingMattresses);
                             
@@ -1461,11 +1461,11 @@
             progressBar.style.width = `${progressWidth}%`;
 
             // حساب عدد السراير والمراتب المطلوبة لعرضها في قسم الحساب
-            const requiredBeds = Math.ceil(familySize / 1.5);
+            const requiredBeds = Math.ceil(familySize / 2);
             const workingBeds = bedsCount - damagedBedsCount;
             const neededBeds = Math.max(0, requiredBeds - workingBeds);
             
-            const requiredMattresses = Math.ceil(familySize / 1.5);
+            const requiredMattresses = Math.ceil(familySize / 2);
             const workingMattresses = mattressesCount - damagedMattressesCount;
             const neededMattresses = Math.max(0, requiredMattresses - workingMattresses);
             
