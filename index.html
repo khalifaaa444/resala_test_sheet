@@ -1541,20 +1541,22 @@
             let rating = 'C';
             let ratingText = 'منخفض';
             let progressWidth = 30;
+            const absNetIncome = Math.abs(netIncome);  // القيمة المطلقة
 
-            if (netIncome <= 750) {
+            if (absNetIncome <= 750) {
                 rating = 'A';
                 ratingText = 'عالي جداً';
                 progressWidth = 90;
-                additionalNotes += 'الأسرة في حاجة ماسة للمساعدة بناءً على الدخل المنخفض. ';
-            } else if (netIncome <= 1500) {
+                additionalNotes += 'الأسرة في حاجة ماسة للمساعدة . ';
+            } else if (absNetIncome <= 1500) {
                 rating = 'B';
                 ratingText = 'متوسط';
                 progressWidth = 60;
                 additionalNotes += 'الأسرة في حاجة للمساعدة ولكن ليست في حالة طارئة. ';
             } else {
-                additionalNotes += 'الأسرة لديها دخل كافٍ نسبياً، يمكن النظر في حالات خاصة. ';
+                additionalNotes += 'الأسرة تقييمها منخفض، يمكن النظر لحالات اكثر استحقاقا ';
             }
+
 
             // عرض النتائج
             const resultDiv = document.getElementById('result');
