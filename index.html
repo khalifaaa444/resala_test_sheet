@@ -1292,7 +1292,7 @@ function generateFamilyMembersInputs() {
     container.innerHTML = '';
     
     // إظهار القسم فقط إذا كان نوع الأسرة "أسرة"
-    if (familyType === 'family' && familySize > 0) {
+    if (familySize > 0) {
         document.getElementById('familyMembersGroup').style.display = 'block';
         
         for (let i = 1; i <= familySize; i++) {
