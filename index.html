@@ -7,6 +7,26 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
+        #saveMessage {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #28a745;
+            color: white;
+            padding: 15px 25px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            font-weight: 500;
+            display: none;
+            z-index: 1000;
+            animation: fadeInUp 0.5s ease;
+        }
+        
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
         .family-member-row {
             background-color: #f8f9fa;
             padding: 10px;
@@ -1187,6 +1207,11 @@
             </div>
         </div>
     </div>
+
+<div id="saveMessage">
+        <i class="fas fa-check-circle"></i> تم حفظ بيانات المستخدم بنجاح في جدول البيانات
+    </div>
+    
     <footer>
         <div class="footer-content">
             <div class="launched-by">
@@ -1198,6 +1223,98 @@
         </div>
     </footer>
     <script>
+
+function collectFormData() {
+            const formData = {
+                timestamp: new Date().toLocaleString('ar-EG'),
+                familyType: document.getElementById('familyType').value,
+                familyName: document.getElementById('familyName').value,
+                nationalId: document.getElementById('nationalId').value,
+                phoneNumber: document.getElementById('phoneNumber').value,
+                familySize: document.getElementById('familySize').value,
+                income: document.getElementById('income').value,
+                expenses: document.getElementById('expenses').value,
+                notes: document.getElementById('notes').value,
+                purchasedItems: document.getElementById('purchasedItems').value,
+                
+                // جمع بيانات الأجهزة
+                bedsCount: document.getElementById('bedsCount').value,
+                damagedBedsCount: document.getElementById('damagedBedsCount').value,
+                mattressesCount: document.getElementById('mattressesCount').value,
+                damagedMattressesCount: document.getElementById('damagedMattressesCount').value,
+                stovesCount: document.getElementById('stovesCount').value,
+                damagedStovesCount: document.getElementById('damagedStovesCount').value,
+                hasOven: document.getElementById('hasOven').checked,
+                washersCount: document.getElementById('washersCount').value,
+                damagedWashersCount: document.getElementById('damagedWashersCount').value,
+                halfWashersCount: document.getElementById('halfWashersCount').value,
+                damagedHalfWashersCount: document.getElementById('damagedHalfWashersCount').value,
+                fridgesCount: document.getElementById('fridgesCount').value,
+                damagedFridgesCount: document.getElementById('damagedFridgesCount').value,
+                
+                // جمع الطلبات
+                requests: Array.from(document.querySelectorAll('input[name="requests"]:checked'))
+                    .map(checkbox => checkbox.nextElementSibling.textContent),
+                
+                // جمع الإجابات على الأسئلة
+                hasProvider: document.querySelector('input[name="hasProvider"]:checked')?.value,
+                hasElderly: document.querySelector('input[name="hasElderly"]:checked')?.value,
+                medicalConditions: document.querySelector('input[name="medicalConditions"]:checked')?.value,
+                smallApartment: document.querySelector('input[name="smallApartment"]:checked')?.value,
+                
+                // جمع أفراد الأسرة
+                familyMembers: []
+            };
+            
+            // جمع أفراد الأسرة
+            const familySize = parseInt(formData.familySize);
+            for (let i = 1; i <= familySize; i++) {
+                const name = document.getElementById(`memberName${i}`)?.value;
+                const relation = document.getElementById(`memberRelation${i}`)?.value;
+                if (name && relation) {
+                    formData.familyMembers.push({name, relation});
+                }
+            }
+            
+            return formData;
+        }
+        
+        // دالة لحفظ البيانات في جدول بيانات Google
+        function saveToGoogleSheet() {
+            const formData = collectFormData();
+            
+            // رابط البرنامج النصي لجوجل (يجب استبداله برابطك الفعلي)
+            const scriptURL = 'https://script.google.com/macros/s/AKfycbxnNvQxg5CQgTm2u0sFpu7to7aYSNeWyupC5WA299TaoqGw1aLir-t-aQ3leFgO0Pk6/exec';
+            
+            fetch(scriptURL, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData)
+            })
+            .then(() => {
+                // عرض رسالة التأكيد
+                const message = document.getElementById('saveMessage');
+                message.style.display = 'block';
+                setTimeout(() => {
+                    message.style.display = 'none';
+                }, 3000);
+            })
+            .catch(error => {
+                console.error('حدث خطأ أثناء الحفظ:', error);
+            });
+        }
+        
+        // إضافة مستمع الأحداث للنقر على زر التقييم
+        document.querySelector('button[type="button"]').addEventListener('click', function() {
+            evaluateFamily(); // تنفيذ التقييم
+            saveToGoogleSheet(); // حفظ البيانات في جدول البيانات
+        });
+
+
+        
         // إظهار/إخفاء الحقول حسب نوع الأسرة
         document.getElementById('familyType').addEventListener('change', function() {
              
