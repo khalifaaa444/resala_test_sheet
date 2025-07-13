@@ -7,6 +7,53 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
+
+
+        /* أنماط جديدة لتحديد الموقع */
+        .location-group {
+            position: relative;
+        }
+        
+        #locationMap {
+            width: 100%;
+            height: 300px;
+            border-radius: var(--border-radius);
+            margin-top: 15px;
+            display: none;
+            border: 1px solid #ddd;
+        }
+        
+        .location-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .location-btn {
+            padding: 8px 15px;
+            background-color: #4361ee;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .location-btn i {
+            font-size: 0.9rem;
+        }
+        
+        .coordinates-display {
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            font-size: 0.9rem;
+        }
+
+    
         #saveMessage {
             position: fixed;
             bottom: 20px;
@@ -809,6 +856,27 @@
                         </div>
                     </div>
 
+                                        <!-- خانة تحديد الموقع الجديدة -->
+                    <div class="form-group location-group">
+                        <label for="location" class="required">تحديد الموقع:</label>
+                        <input type="text" id="location" required placeholder="أدخل العنوان أو انقر لتحديد الموقع على الخريطة">
+                        
+                        <div class="location-actions">
+                            <button type="button" class="location-btn" onclick="showLocationMap()">
+                                <i class="fas fa-map-marker-alt"></i> تحديد على الخريطة
+                            </button>
+                            <button type="button" class="location-btn" onclick="getCurrentLocation()">
+                                <i class="fas fa-location-arrow"></i> موقعي الحالي
+                            </button>
+                        </div>
+                        
+                        <div id="locationMap"></div>
+                        
+                        <div class="coordinates-display">
+                            <div>إحداثيات الموقع: <span id="coordinates">لم يتم التحديد بعد</span></div>
+                        </div>
+                    </div>
+
                     <div id="providerGroup" class="form-group" style="display: none;">
                         <label>هل يوجد عائل للعروسة؟</label>
                         <div class="radio-group">
@@ -1223,6 +1291,78 @@
         </div>
     </footer>
     <script>
+
+         // ===== دوال جديدة لتحديد الموقع =====
+        
+        let map;
+        let marker;
+        let selectedLocation = null;
+        
+        // إظهار خريطة تحديد الموقع
+        function showLocationMap() {
+            const mapDiv = document.getElementById('locationMap');
+            mapDiv.style.display = 'block';
+            
+            // تهيئة الخريطة إذا لم تكن موجودة
+            if (!map) {
+                map = L.map('locationMap').setView([30.0444, 31.2357], 13); // إحداثيات القاهرة الافتراضية
+                
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                }).addTo(map);
+                
+                // إضافة علامة عند النقر على الخريطة
+                map.on('click', function(e) {
+                    if (marker) {
+                        map.removeLayer(marker);
+                    }
+                    
+                    marker = L.marker(e.latlng).addTo(map)
+                        .bindPopup('الموقع المحدد').openPopup();
+                    
+                    selectedLocation = e.latlng;
+                    document.getElementById('coordinates').textContent = 
+                        `خط العرض: ${e.latlng.lat.toFixed(6)}, خط الطول: ${e.latlng.lng.toFixed(6)}`;
+                    
+                    // تحديث حقل الموقع
+                    document.getElementById('location').value = 'موقع محدّد على الخريطة';
+                });
+            }
+        }
+        
+        // الحصول على الموقع الحالي للمستخدم
+        function getCurrentLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    function(position) {
+                        const lat = position.coords.latitude;
+                        const lng = position.coords.longitude;
+                        
+                        if (map) {
+                            if (marker) {
+                                map.removeLayer(marker);
+                            }
+                            
+                            map.setView([lat, lng], 15);
+                            marker = L.marker([lat, lng]).addTo(map)
+                                .bindPopup('موقعك الحالي').openPopup();
+                            
+                            selectedLocation = { lat, lng };
+                            document.getElementById('coordinates').textContent = 
+                                `خط العرض: ${lat.toFixed(6)}, خط الطول: ${lng.toFixed(6)}`;
+                            
+                            document.getElementById('location').value = 'موقعي الحالي';
+                        }
+                    },
+                    function(error) {
+                        alert('تعذر الحصول على موقعك: ' + error.message);
+                    }
+                );
+            } else {
+                alert('المتصفح لا يدعم تحديد الموقع الجغرافي');
+            }
+        }
+        
 // متغيرات لتخزين نتيجة التقييم
         let currentRating = '';
         let currentEligibility = '';
@@ -1241,6 +1381,10 @@ function collectFormData() {
                 expenses: document.getElementById('expenses').value,
                 notes: document.getElementById('notes').value,
                 purchasedItems: document.getElementById('purchasedItems').value,
+
+// إضافة إحداثيات الموقع إذا تم تحديدها
+                coordinates: selectedLocation ? 
+                    `${selectedLocation.lat.toFixed(6)},${selectedLocation.lng.toFixed(6)}` : ''
                 
                 // جمع بيانات الأجهزة
                 bedsCount: document.getElementById('bedsCount').value,
@@ -1289,6 +1433,23 @@ function collectFormData() {
             
             return formData;
         }
+        // ===== تهيئة مكتبة الخرائط عند تحميل الصفحة =====
+        document.addEventListener('DOMContentLoaded', function() {
+            // تحميل مكتبة Leaflet JS بشكل ديناميكي
+            const leafletScript = document.createElement('script');
+            leafletScript.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+            leafletScript.integrity = 'sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=';
+            leafletScript.crossOrigin = '';
+            document.head.appendChild(leafletScript);
+            
+            // تحميل مكتبة Leaflet CSS بشكل ديناميكي
+            const leafletCSS = document.createElement('link');
+            leafletCSS.rel = 'stylesheet';
+            leafletCSS.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
+            leafletCSS.integrity = 'sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=';
+            leafletCSS.crossOrigin = '';
+            document.head.appendChild(leafletCSS);
+        });
         
         // دالة لحفظ البيانات في جدول بيانات Google
 function saveToGoogleSheet() {
